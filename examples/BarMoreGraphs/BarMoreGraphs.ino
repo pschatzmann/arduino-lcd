@@ -1,16 +1,15 @@
-#include <LiquidCrystal.h>
-#include <LcdBarGraph.h>
+#include <LCD.h>
 
 byte lcdNumCols = 16; // -- number of columns in the LCD
 
-LiquidCrystal lcd(12, 11, 5, 4, 3, 2); // -- creating LCD instance
+LCD lcd(12, 11, 5, 4, 3, 2); // -- creating LCD instance
 // -- creating a 4 chars wide bars
-LcdBarGraph lbg0(&lcd, 4, 0, 0); // -- First line at column 0
-LcdBarGraph lbg1(&lcd, 4, 5, 0); // -- First line at column 5
-LcdBarGraph lbg2(&lcd, 4, 10, 0); // -- First line at column 10
-LcdBarGraph lbg3(&lcd, 4, 0, 1); // -- Second line at column 0
-LcdBarGraph lbg4(&lcd, 4, 5, 1);  // -- Second line at column 5
-LcdBarGraph lbg5(&lcd, 4, 10, 1); // -- Second line at column 0
+LCDBarGraph lbg0(lcd, 4, 0, 0); // -- First line at column 0
+LCDBarGraph lbg1(lcd, 4, 5, 0); // -- First line at column 5
+LCDBarGraph lbg2(lcd, 4, 10, 0); // -- First line at column 10
+LCDBarGraph lbg3(lcd, 4, 0, 1); // -- Second line at column 0
+LCDBarGraph lbg4(lcd, 4, 5, 1);  // -- Second line at column 5
+LCDBarGraph lbg5(lcd, 4, 10, 1); // -- Second line at column 0
 
 byte i0 = 0;
 byte i1 = 0;

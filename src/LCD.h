@@ -553,7 +553,7 @@ protected:
 };
 
 /**
- * @brief LcdBarGraph is class for displaying analog values in LCD display,
+ * @brief LCDBarGraph is class for displaying analog values in LCD display,
  * which is previously initialized. This library uses LiquedCrystal library
  * for displaying.
  * @author Balazs Kelemen
@@ -561,8 +561,8 @@ protected:
  * contact: prampec+arduino@gmail.com
  * credits: Hans van Neck
  * copying: permission statement:
-    This file is part of LcdBarGraph.
-    LcdBarGraph is free software: you can redistribute it and/or modify
+    This file is part of LCDBarGraph.
+    LCDBarGraph is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.

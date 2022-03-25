@@ -7,3 +7,6 @@ This library is using the same API like the [LiquidCristal](https://github.com/a
 - __LCDBarGraph__ class to display bars
 - Support for __I2C Module__
 
+## Documentation
+
+- [Class Documentation](https://pschatzmann.github.io/arduino-lcd/html/annotated.html)

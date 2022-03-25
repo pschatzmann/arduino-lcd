@@ -109,7 +109,51 @@ protected:
 };
 
 /**
- * @brief Output to LCD
+ * @brief LCDClient which processes the request provided by the indicated Stream
+ * in the Arduino loop call process().
+ */
+class LCDClient {
+  LCDClient(Stream &in) { p_in = &in; };
+
+  /// Call this method in the loop
+  void process(int delay_no_data = 100) {
+    if (p_in->available() > 0) {
+      if (p_in->readBytes((uint8_t *)&cmd, sizeof(Cmd)) > 0) {
+        switch (cmd.id) {
+        case MODE:
+          pinMode(cmd.p1, cmd.p1);
+          break;
+        case WRITE:
+          digitalWrite(cmd.p1, cmd.p1);
+          break;
+        case DELAY:
+          delayMicroseconds(cmd.p1);
+          break;
+        case PULSE:
+          defaultDriver.pulseEnable(cmd.p1);
+          break;
+        case BRIGHTNESS:
+          defaultDriver.setBrightness(cmd.p1, cmd.p2);
+          break;
+        default:
+          Serial.print("Error - undefined id");
+          break;
+        }
+      }
+    } else {
+      delay(delay_no_data);
+    }
+  }
+
+protected:
+  Stream *p_in = nullptr;
+  static const int len = 80;
+  Cmd cmd;
+  LCDDriver defaultDriver;
+};
+
+/**
+ * @brief Output to LCD - Common Functionality
  *
  */
 class CommonLCD : public Print {
@@ -282,6 +326,10 @@ protected:
   uint8_t _numlines;
 };
 
+/**
+ * @brief Output to LCD
+ * 
+ */
 class LCD : public CommonLCD {
 public:
   // When the display powers up, it is configured as follows:
@@ -516,6 +564,8 @@ protected:
   AbstractLCDDriver *p_driver = nullptr;
 };
 
+
+
 /**
  * @brief Control LCD Display using I2C module
  * 
@@ -666,49 +716,6 @@ protected:
   }
 };
 
-/**
- * @brief LCDClient which processes the request provided by the indicated Stream
- * in the Arduino loop call process().
- */
-class LCDClient {
-  LCDClient(Stream &in) { p_in = &in; };
-
-  /// Call this method in the loop
-  void process(int delay_no_data = 100) {
-    if (p_in->available() > 0) {
-      if (p_in->readBytes((uint8_t *)&cmd, sizeof(Cmd)) > 0) {
-        switch (cmd.id) {
-        case MODE:
-          pinMode(cmd.p1, cmd.p1);
-          break;
-        case WRITE:
-          digitalWrite(cmd.p1, cmd.p1);
-          break;
-        case DELAY:
-          delayMicroseconds(cmd.p1);
-          break;
-        case PULSE:
-          defaultDriver.pulseEnable(cmd.p1);
-          break;
-        case BRIGHTNESS:
-          defaultDriver.setBrightness(cmd.p1, cmd.p2);
-          break;
-        default:
-          Serial.print("Error - undefined id");
-          break;
-        }
-      }
-    } else {
-      delay(delay_no_data);
-    }
-  }
-
-protected:
-  Stream *p_in = nullptr;
-  static const int len = 80;
-  Cmd cmd;
-  LCDDriver defaultDriver;
-};
 
 /**
  * @brief LCDBarGraph is class for displaying analog values in LCD display,

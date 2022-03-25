@@ -268,17 +268,13 @@ public:
 
   /*********** mid level commands, for sending data/cmds */
 
-  inline void command(uint8_t value) { send(value, LOW); }
+  virtual void begin(uint8_t lcd_cols, uint8_t lcd_rows,
+                     uint8_t charsize = LCD_5x8DOTS) = 0;
 
   inline size_t write(uint8_t value) {
     send(value, HIGH);
     return 1; // assume success
   }
-
-  virtual void begin(uint8_t lcd_cols, uint8_t lcd_rows,
-                     uint8_t charsize = LCD_5x8DOTS) = 0;
-  virtual void delayMicrosecondsLCD(uint16_t ms) = 0;
-  virtual void send(uint8_t value, uint8_t mode) = 0;
 
   using Print::write;
 
@@ -326,6 +322,11 @@ protected:
   uint8_t _displaymode;
   uint8_t _displaycontrol;
   uint8_t _numlines;
+
+  inline void command(uint8_t value) { send(value, LOW); }
+  virtual void delayMicrosecondsLCD(uint16_t ms) = 0;
+  virtual void send(uint8_t value, uint8_t mode) = 0;
+
 };
 
 /**

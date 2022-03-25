@@ -854,11 +854,14 @@ class LCDMenu;
  */
 class LCDMenuText {
  public:
-  LCDMenuText(uint16_t x, uint16_t y, const char *txt, bool selectable = false) {
+  LCDMenuText(uint16_t x, uint16_t y, const char *txt, bool selectable = false,
+              void (*selectText)(uint16_t screen_pos, uint16_t text_pos,
+                                 const char *txt) = nullptr) {
     this->x = x;
     this->y = y;
     this->txt = txt;
     this->selectable = select;
+    this->p_select_text = selectText;
   }
 
  protected:
@@ -867,6 +870,8 @@ class LCDMenuText {
   uint16_t y;
   const char *txt = nullptr;
   bool selectable;
+  void (*p_select_text)(uint16_t screen_pos, uint16_t text_pos,
+                        const char *txt) = nullptr;
 };
 
 /**
@@ -876,17 +881,22 @@ class LCDMenuText {
 class LCDMenuScreen {
  public:
   template <int N>
-  LCDMenuScreen(const LCDMenuText *(&texts)[N], void (*select)(uint16_t screen_pos)) {
+  LCDMenuScreen(const LCDMenuText *(&texts)[N],
+                void (*selectScreen)(uint16_t screen_pos, uint16_t text_pos,
+                                     const char *txt) = nullptr,
+                void (*selectText)(uint16_t screen_pos, uint16_t text_pos,
+                                   const char *txt) = nullptr) {
     this->txt = texts;
     this->len = N;
-    this->p_select = select;
+    this->p_select_screen = selectScreen;
+    this->p_select_text = selectText;
 
     for (int j = 0; j < len; j++) {
       if (txt[j].selectable) {
         lenSelectable++;
       }
     }
-    selectable = new LCDMenuText*[lenSelectable];
+    selectable = new LCDMenuText *[lenSelectable];
     int sel_pos = 0;
     for (int j = 0; j < len; j++) {
       if (txt[j].selectable) {
@@ -895,8 +905,8 @@ class LCDMenuScreen {
     }
   }
 
-  ~LCDMenuScreen(){
-    if (selectable!=nullptr){
+  ~LCDMenuScreen() {
+    if (selectable != nullptr) {
       delete[] selectable;
     }
   }
@@ -912,16 +922,20 @@ class LCDMenuScreen {
   }
 
   void selectScreen(uint16_t pos) {
-    if (p_select != nullptr) {
-      p_select(pos);
+    if (p_select_screen != nullptr) {
+      const char *str = nullptr;
+      if (text_pos >= 0) {
+        str = selectable[text_pos]->txt;
+      }
+      p_select_screen(pos, text_pos, str);
     }
   }
 
-  int nextText() { return selectText(++text_pos); }
+  int nextText() { return setText(++text_pos); }
 
-  int priorText() { return selectText(--text_pos); }
+  int priorText() { return setText(--text_pos); }
 
-  int selectText(int pos) {
+  int setText(int pos) {
     if (pos > lenSelectable) {
       pos = 0;
     }
@@ -934,6 +948,7 @@ class LCDMenuScreen {
       p_lcd->cursor();
       p_lcd->blink();
     } else {
+      text_pos = -1;
       p_lcd->noCursor();
       p_lcd->noBlink();
     }
@@ -947,12 +962,32 @@ class LCDMenuScreen {
   CommonLCD *p_lcd;
   int len;
   LCDMenuText *txt;
-  void (*p_select)(uint16_t screen_pos) = nullptr;
+  void (*p_select_screen)(uint16_t screen_pos, uint16_t text_pos,
+                          const char *txt) = nullptr;
+  void (*p_select_text)(uint16_t screen_pos, uint16_t text_pos,
+                        const char *txt) = nullptr;
   int lenSelectable = 0;
   LCDMenuText **selectable;
   int text_pos = 0;
 
   void setLCD(CommonLCD *lcd) { p_lcd = lcd; }
+
+  /// calls the callback on the actually selected text
+  void selectText(int screen) {
+    // callback defined on text element
+    const char *str = nullptr;
+    if (text_pos >= 0) {
+      str = selectable[text_pos]->txt;
+    }
+
+    if (selectable[text_pos]->p_select_text) {
+      selectable[text_pos]->p_select_text(text_pos, text_pos, str);
+    }
+    // callback defined here
+    if (p_select_text != nullptr) {
+      p_select_text(text_pos, text_pos, str);
+    }
+  }
 };
 
 /**
@@ -989,8 +1024,10 @@ class LCDMenu {
 
   /// Moves to the next screen
   int nextScreen() { return setScreen(++current); }
+
   /// Moves to the prior screed
   int priorScreen() { return setScreen(++current); }
+
   /// Moves to the indicated screen index
   int setScreen(int pos) {
     if (active) {
@@ -1013,13 +1050,15 @@ class LCDMenu {
     current_screen->selectText(0);
   }
 
+  /// Executes the callback of the currently selected text
+  void selectText() { current_screen->selectText(current); }
+
   /// moves to the next selectable text
   int nextText() { return current_screen->nextText(); }
   /// moves to the prior selectable text
   int priorText() { return current_screen->priorText(); }
   /// Selects the text at the indicated index
-  int selectText(int pos) { return current_screen->selectText(pos); }
-
+  int setText(int pos) { return current_screen->setText(pos); }
 
  protected:
   int len;

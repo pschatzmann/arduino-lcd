@@ -78,9 +78,9 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a9f103525e7b4b6575509e8edd8d1eff4"><td class="memItemLeft" align="right" valign="top"><a id="a9f103525e7b4b6575509e8edd8d1eff4"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>LCDMenuText</b> (uint16_t x, uint16_t y, const char *txt, bool selectable=false)</td></tr>
-<tr class="separator:a9f103525e7b4b6575509e8edd8d1eff4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a01fcf0acc43fda75d1780e85ab797b38"><td class="memItemLeft" align="right" valign="top"><a id="a01fcf0acc43fda75d1780e85ab797b38"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>LCDMenuText</b> (uint16_t x, uint16_t y, const char *txt, bool selectable=false, void(*selectText)(uint16_t screen_pos, uint16_t text_pos, const char *txt)=nullptr)</td></tr>
+<tr class="separator:a01fcf0acc43fda75d1780e85ab797b38"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
@@ -96,6 +96,9 @@ const char *&#160;</td><td class="memItemRight" valign="bottom"><b>txt</b> = nul
 <tr class="memitem:a9b4a1e5dd432d68688c9b8b11bae3455"><td class="memItemLeft" align="right" valign="top"><a id="a9b4a1e5dd432d68688c9b8b11bae3455"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>selectable</b></td></tr>
 <tr class="separator:a9b4a1e5dd432d68688c9b8b11bae3455"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad597c47c51cbe1afa2945ff7b027300c"><td class="memItemLeft" align="right" valign="top"><a id="ad597c47c51cbe1afa2945ff7b027300c"></a>
+void(*&#160;</td><td class="memItemRight" valign="bottom"><b>p_select_text</b> )(uint16_t screen_pos, uint16_t text_pos, const char *txt) = nullptr</td></tr>
+<tr class="separator:ad597c47c51cbe1afa2945ff7b027300c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
 Friends</h2></td></tr>

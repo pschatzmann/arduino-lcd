@@ -79,10 +79,10 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:af82f8f89eaea36522ba3e0821a107b04"><td class="memTemplParams" colspan="2"><a id="af82f8f89eaea36522ba3e0821a107b04"></a>
+<tr class="memitem:a8f47f98993b3562caebc781cc90091ba"><td class="memTemplParams" colspan="2"><a id="a8f47f98993b3562caebc781cc90091ba"></a>
 template&lt;int N&gt; </td></tr>
-<tr class="memitem:af82f8f89eaea36522ba3e0821a107b04"><td class="memTemplItemLeft" align="right" valign="top">&#160;</td><td class="memTemplItemRight" valign="bottom"><b>LCDMenuScreen</b> (const <a class="el" href="class_l_c_d_menu_text.html">LCDMenuText</a> *(&amp;texts)[N], void(*select)(uint16_t screen_pos))</td></tr>
-<tr class="separator:af82f8f89eaea36522ba3e0821a107b04"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8f47f98993b3562caebc781cc90091ba"><td class="memTemplItemLeft" align="right" valign="top">&#160;</td><td class="memTemplItemRight" valign="bottom"><b>LCDMenuScreen</b> (const <a class="el" href="class_l_c_d_menu_text.html">LCDMenuText</a> *(&amp;texts)[N], void(*selectScreen)(uint16_t screen_pos, uint16_t text_pos, const char *txt)=nullptr, void(*<a class="el" href="class_l_c_d_menu_screen.html#acf6aa363906cde8ac9a0fb812d3dd4a8">selectText</a>)(uint16_t screen_pos, uint16_t text_pos, const char *txt)=nullptr)</td></tr>
+<tr class="separator:a8f47f98993b3562caebc781cc90091ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aee27eb9f1d6e80ff0b6f2294c6a1ed6a"><td class="memItemLeft" align="right" valign="top"><a id="aee27eb9f1d6e80ff0b6f2294c6a1ed6a"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>display</b> ()</td></tr>
 <tr class="separator:aee27eb9f1d6e80ff0b6f2294c6a1ed6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -95,9 +95,9 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>nextText</b> ()</td></
 <tr class="memitem:af41a1fdfeb70277e237e99993f88756a"><td class="memItemLeft" align="right" valign="top"><a id="af41a1fdfeb70277e237e99993f88756a"></a>
 int&#160;</td><td class="memItemRight" valign="bottom"><b>priorText</b> ()</td></tr>
 <tr class="separator:af41a1fdfeb70277e237e99993f88756a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a19d7970a87da3f4c16a4fe3d4ba863f9"><td class="memItemLeft" align="right" valign="top"><a id="a19d7970a87da3f4c16a4fe3d4ba863f9"></a>
-int&#160;</td><td class="memItemRight" valign="bottom"><b>selectText</b> (int pos)</td></tr>
-<tr class="separator:a19d7970a87da3f4c16a4fe3d4ba863f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa4314235719a6c72a1498d2a59276c93"><td class="memItemLeft" align="right" valign="top"><a id="aa4314235719a6c72a1498d2a59276c93"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>setText</b> (int pos)</td></tr>
+<tr class="separator:aa4314235719a6c72a1498d2a59276c93"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a60bf227e65e558b7059471e6086fc8ea"><td class="memItemLeft" align="right" valign="top"><a id="a60bf227e65e558b7059471e6086fc8ea"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>clear</b> ()</td></tr>
 <tr class="separator:a60bf227e65e558b7059471e6086fc8ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -107,6 +107,10 @@ Protected Member Functions</h2></td></tr>
 <tr class="memitem:ab4d98960db2f3145ded284be9050601d"><td class="memItemLeft" align="right" valign="top"><a id="ab4d98960db2f3145ded284be9050601d"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>setLCD</b> (<a class="el" href="class_common_l_c_d.html">CommonLCD</a> *lcd)</td></tr>
 <tr class="separator:ab4d98960db2f3145ded284be9050601d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acf6aa363906cde8ac9a0fb812d3dd4a8"><td class="memItemLeft" align="right" valign="top"><a id="acf6aa363906cde8ac9a0fb812d3dd4a8"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_l_c_d_menu_screen.html#acf6aa363906cde8ac9a0fb812d3dd4a8">selectText</a> (int screen)</td></tr>
+<tr class="memdesc:acf6aa363906cde8ac9a0fb812d3dd4a8"><td class="mdescLeft">&#160;</td><td class="mdescRight">calls the callback on the actually selected text <br /></td></tr>
+<tr class="separator:acf6aa363906cde8ac9a0fb812d3dd4a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
@@ -119,9 +123,12 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>len</b></td></tr>
 <tr class="memitem:af1d51690bb4207b028d0cab4003a7a89"><td class="memItemLeft" align="right" valign="top"><a id="af1d51690bb4207b028d0cab4003a7a89"></a>
 <a class="el" href="class_l_c_d_menu_text.html">LCDMenuText</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>txt</b></td></tr>
 <tr class="separator:af1d51690bb4207b028d0cab4003a7a89"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a51de40f892b5347e7e47bc23c88fa87c"><td class="memItemLeft" align="right" valign="top"><a id="a51de40f892b5347e7e47bc23c88fa87c"></a>
-void(*&#160;</td><td class="memItemRight" valign="bottom"><b>p_select</b> )(uint16_t screen_pos) = nullptr</td></tr>
-<tr class="separator:a51de40f892b5347e7e47bc23c88fa87c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a67862200ed1d2448212288f27cc554ff"><td class="memItemLeft" align="right" valign="top"><a id="a67862200ed1d2448212288f27cc554ff"></a>
+void(*&#160;</td><td class="memItemRight" valign="bottom"><b>p_select_screen</b> )(uint16_t screen_pos, uint16_t text_pos, const char *txt) = nullptr</td></tr>
+<tr class="separator:a67862200ed1d2448212288f27cc554ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad7e122c1224f089723d0fcd29906146f"><td class="memItemLeft" align="right" valign="top"><a id="ad7e122c1224f089723d0fcd29906146f"></a>
+void(*&#160;</td><td class="memItemRight" valign="bottom"><b>p_select_text</b> )(uint16_t screen_pos, uint16_t text_pos, const char *txt) = nullptr</td></tr>
+<tr class="separator:ad7e122c1224f089723d0fcd29906146f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab959bfbe4bf131d68839eeefea459016"><td class="memItemLeft" align="right" valign="top"><a id="ab959bfbe4bf131d68839eeefea459016"></a>
 int&#160;</td><td class="memItemRight" valign="bottom"><b>lenSelectable</b> = 0</td></tr>
 <tr class="separator:ab959bfbe4bf131d68839eeefea459016"><td class="memSeparator" colspan="2">&#160;</td></tr>

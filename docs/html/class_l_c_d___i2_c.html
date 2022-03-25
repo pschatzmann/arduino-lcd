@@ -87,12 +87,11 @@ Inheritance diagram for LCD_I2C:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a77b6edfc78083229ecfc45013176e9b9"><td class="memItemLeft" align="right" valign="top"><a id="a77b6edfc78083229ecfc45013176e9b9" name="a77b6edfc78083229ecfc45013176e9b9"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>LCD_I2C</b> (uint8_t lcd_addr, uint8_t lcd_cols, uint8_t lcd_rows, uint8_t charsize)</td></tr>
-<tr class="separator:a77b6edfc78083229ecfc45013176e9b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac3a2b019e46d05fc4ffb9150537aa51a"><td class="memItemLeft" align="right" valign="top"><a id="ac3a2b019e46d05fc4ffb9150537aa51a" name="ac3a2b019e46d05fc4ffb9150537aa51a"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>begin</b> ()</td></tr>
-<tr class="separator:ac3a2b019e46d05fc4ffb9150537aa51a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaa1731138008ab5e4beae12409a08001"><td class="memItemLeft" align="right" valign="top"><a id="aaa1731138008ab5e4beae12409a08001" name="aaa1731138008ab5e4beae12409a08001"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>LCD_I2C</b> (uint8_t lcd_addr)</td></tr>
+<tr class="separator:aaa1731138008ab5e4beae12409a08001"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5c988b7850e89dfe524bcaab1878f868"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_l_c_d___i2_c.html#a5c988b7850e89dfe524bcaab1878f868">begin</a> (uint8_t lcd_cols, uint8_t lcd_rows, uint8_t charsize=LCD_5x8DOTS)</td></tr>
+<tr class="separator:a5c988b7850e89dfe524bcaab1878f868"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab3d9ed2992355278b186902e2fe49b7f"><td class="memItemLeft" align="right" valign="top"><a id="ab3d9ed2992355278b186902e2fe49b7f" name="ab3d9ed2992355278b186902e2fe49b7f"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>noBacklight</b> (void)</td></tr>
 <tr class="separator:ab3d9ed2992355278b186902e2fe49b7f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -163,6 +162,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>command</b> (uint8_t 
 <tr class="memitem:a7bd23d742dc7a9533b94a35d001746e2 inherit pub_methods_class_common_l_c_d"><td class="memItemLeft" align="right" valign="top"><a id="a7bd23d742dc7a9533b94a35d001746e2" name="a7bd23d742dc7a9533b94a35d001746e2"></a>
 size_t&#160;</td><td class="memItemRight" valign="bottom"><b>write</b> (uint8_t value)</td></tr>
 <tr class="separator:a7bd23d742dc7a9533b94a35d001746e2 inherit pub_methods_class_common_l_c_d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a11b7e4622a77ddb2450afe10bd0c6468 inherit pub_methods_class_common_l_c_d"><td class="memItemLeft" align="right" valign="top"><a id="a11b7e4622a77ddb2450afe10bd0c6468" name="a11b7e4622a77ddb2450afe10bd0c6468"></a>
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>begin</b> (uint8_t lcd_cols, uint8_t lcd_rows, uint8_t charsize=LCD_5x8DOTS)=0</td></tr>
+<tr class="separator:a11b7e4622a77ddb2450afe10bd0c6468 inherit pub_methods_class_common_l_c_d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aedb4f6742fdbadea5f20d16219b1fb91 inherit pub_methods_class_common_l_c_d"><td class="memItemLeft" align="right" valign="top"><a id="aedb4f6742fdbadea5f20d16219b1fb91" name="aedb4f6742fdbadea5f20d16219b1fb91"></a>
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>delayMicrosecondsLCD</b> (uint16_t ms)=0</td></tr>
 <tr class="separator:aedb4f6742fdbadea5f20d16219b1fb91 inherit pub_methods_class_common_l_c_d"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -339,6 +341,50 @@ static const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>LCD_5
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p >Control <a class="el" href="class_l_c_d.html" title="Output to LCD.">LCD</a> Display using I2C module. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
+<a id="a5c988b7850e89dfe524bcaab1878f868" name="a5c988b7850e89dfe524bcaab1878f868"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5c988b7850e89dfe524bcaab1878f868">&#9670;&nbsp;</a></span>begin()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void LCD_I2C::begin </td>
+          <td>(</td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>lcd_cols</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>lcd_rows</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>charsize</em> = <code>LCD_5x8DOTS</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Implements <a class="el" href="class_common_l_c_d.html">CommonLCD</a>.</p>
+
+</div>
+</div>
 <a id="a6251617a8e817cfb331fac638db84a27" name="a6251617a8e817cfb331fac638db84a27"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a6251617a8e817cfb331fac638db84a27">&#9670;&nbsp;</a></span>send()</h2>
 

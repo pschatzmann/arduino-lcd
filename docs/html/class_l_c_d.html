@@ -99,11 +99,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a04d6bf361ce845062a41a3017e25b2d7"><td class="memItemLeft" align="right" valign="top"><a id="a04d6bf361ce845062a41a3017e25b2d7" name="a04d6bf361ce845062a41a3017e25b2d7"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>LCD</b> (uint8_t rs, uint8_t enable, uint8_t d0, uint8_t d1, uint8_t d2, uint8_t d3, uint8_t leda=0, <a class="el" href="struct_abstract_l_c_d_driver.html">AbstractLCDDriver</a> &amp;driver=defaultDriver)</td></tr>
 <tr class="separator:a04d6bf361ce845062a41a3017e25b2d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acccc091b1e5c02cd2390f5b50eb4d21e"><td class="memItemLeft" align="right" valign="top"><a id="acccc091b1e5c02cd2390f5b50eb4d21e" name="acccc091b1e5c02cd2390f5b50eb4d21e"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>init</b> (uint8_t fourbitmode, uint8_t rs, uint8_t rw, uint8_t enable, uint8_t d0, uint8_t d1, uint8_t d2, uint8_t d3, uint8_t d4, uint8_t d5, uint8_t d6, uint8_t d7, uint8_t led_a, <a class="el" href="struct_abstract_l_c_d_driver.html">AbstractLCDDriver</a> &amp;driver=defaultDriver)</td></tr>
-<tr class="separator:acccc091b1e5c02cd2390f5b50eb4d21e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac85e9b9d58144ee68d5db46cdd9426a4"><td class="memItemLeft" align="right" valign="top"><a id="ac85e9b9d58144ee68d5db46cdd9426a4" name="ac85e9b9d58144ee68d5db46cdd9426a4"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>begin</b> (uint8_t cols, uint8_t lines, uint8_t dotsize=LCD_5x8DOTS)</td></tr>
+<tr class="memitem:ac85e9b9d58144ee68d5db46cdd9426a4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_l_c_d.html#ac85e9b9d58144ee68d5db46cdd9426a4">begin</a> (uint8_t cols, uint8_t lines, uint8_t dotsize=LCD_5x8DOTS)</td></tr>
 <tr class="separator:ac85e9b9d58144ee68d5db46cdd9426a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3c2b0f541794fdffca501e4be962a54b"><td class="memItemLeft" align="right" valign="top"><a id="a3c2b0f541794fdffca501e4be962a54b" name="a3c2b0f541794fdffca501e4be962a54b"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>setBrightness</b> (int percent)</td></tr>
@@ -170,6 +166,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>command</b> (uint8_t 
 <tr class="memitem:a7bd23d742dc7a9533b94a35d001746e2 inherit pub_methods_class_common_l_c_d"><td class="memItemLeft" align="right" valign="top"><a id="a7bd23d742dc7a9533b94a35d001746e2" name="a7bd23d742dc7a9533b94a35d001746e2"></a>
 size_t&#160;</td><td class="memItemRight" valign="bottom"><b>write</b> (uint8_t value)</td></tr>
 <tr class="separator:a7bd23d742dc7a9533b94a35d001746e2 inherit pub_methods_class_common_l_c_d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a11b7e4622a77ddb2450afe10bd0c6468 inherit pub_methods_class_common_l_c_d"><td class="memItemLeft" align="right" valign="top"><a id="a11b7e4622a77ddb2450afe10bd0c6468" name="a11b7e4622a77ddb2450afe10bd0c6468"></a>
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>begin</b> (uint8_t lcd_cols, uint8_t lcd_rows, uint8_t charsize=LCD_5x8DOTS)=0</td></tr>
+<tr class="separator:a11b7e4622a77ddb2450afe10bd0c6468 inherit pub_methods_class_common_l_c_d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aedb4f6742fdbadea5f20d16219b1fb91 inherit pub_methods_class_common_l_c_d"><td class="memItemLeft" align="right" valign="top"><a id="aedb4f6742fdbadea5f20d16219b1fb91" name="aedb4f6742fdbadea5f20d16219b1fb91"></a>
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>delayMicrosecondsLCD</b> (uint16_t ms)=0</td></tr>
 <tr class="separator:aedb4f6742fdbadea5f20d16219b1fb91 inherit pub_methods_class_common_l_c_d"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -179,6 +178,9 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>send</b> (uin
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-methods" name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
+<tr class="memitem:acccc091b1e5c02cd2390f5b50eb4d21e"><td class="memItemLeft" align="right" valign="top"><a id="acccc091b1e5c02cd2390f5b50eb4d21e" name="acccc091b1e5c02cd2390f5b50eb4d21e"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>init</b> (uint8_t fourbitmode, uint8_t rs, uint8_t rw, uint8_t enable, uint8_t d0, uint8_t d1, uint8_t d2, uint8_t d3, uint8_t d4, uint8_t d5, uint8_t d6, uint8_t d7, uint8_t led_a, <a class="el" href="struct_abstract_l_c_d_driver.html">AbstractLCDDriver</a> &amp;driver=defaultDriver)</td></tr>
+<tr class="separator:acccc091b1e5c02cd2390f5b50eb4d21e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac740e9489fdff4f2f40fab32146e5562"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_l_c_d.html#ac740e9489fdff4f2f40fab32146e5562">send</a> (uint8_t value, uint8_t mode)</td></tr>
 <tr class="separator:ac740e9489fdff4f2f40fab32146e5562"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa306e9d68ab22f765ca5270727d93661"><td class="memItemLeft" align="right" valign="top"><a id="aa306e9d68ab22f765ca5270727d93661" name="aa306e9d68ab22f765ca5270727d93661"></a>
@@ -330,6 +332,50 @@ static const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>LCD_5
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p >Output to <a class="el" href="class_l_c_d.html" title="Output to LCD.">LCD</a>. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
+<a id="ac85e9b9d58144ee68d5db46cdd9426a4" name="ac85e9b9d58144ee68d5db46cdd9426a4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac85e9b9d58144ee68d5db46cdd9426a4">&#9670;&nbsp;</a></span>begin()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void LCD::begin </td>
+          <td>(</td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>cols</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>lines</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>dotsize</em> = <code>LCD_5x8DOTS</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Implements <a class="el" href="class_common_l_c_d.html">CommonLCD</a>.</p>
+
+</div>
+</div>
 <a id="a0893d52f04e9786eac95c8dd75527a6c" name="a0893d52f04e9786eac95c8dd75527a6c"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a0893d52f04e9786eac95c8dd75527a6c">&#9670;&nbsp;</a></span>delayMicrosecondsLCD()</h2>
 

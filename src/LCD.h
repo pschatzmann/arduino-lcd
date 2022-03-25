@@ -275,10 +275,12 @@ public:
     return 1; // assume success
   }
 
-  using Print::write;
-
+  virtual void begin(uint8_t lcd_cols, uint8_t lcd_rows,
+                     uint8_t charsize = LCD_5x8DOTS) = 0;
   virtual void delayMicrosecondsLCD(uint16_t ms) = 0;
   virtual void send(uint8_t value, uint8_t mode) = 0;
+
+  using Print::write;
 
 protected:
   // commands
@@ -328,7 +330,7 @@ protected:
 
 /**
  * @brief Output to LCD
- * 
+ *
  */
 class LCD : public CommonLCD {
 public:
@@ -372,35 +374,6 @@ public:
   LCD(uint8_t rs, uint8_t enable, uint8_t d0, uint8_t d1, uint8_t d2,
       uint8_t d3, uint8_t leda = 0, AbstractLCDDriver &driver = defaultDriver) {
     init(1, rs, 255, enable, d0, d1, d2, d3, 0, 0, 0, 0, leda, driver);
-  }
-
-  void init(uint8_t fourbitmode, uint8_t rs, uint8_t rw, uint8_t enable,
-            uint8_t d0, uint8_t d1, uint8_t d2, uint8_t d3, uint8_t d4,
-            uint8_t d5, uint8_t d6, uint8_t d7, uint8_t led_a,
-            AbstractLCDDriver &driver = defaultDriver) {
-
-    p_driver = &driver;
-    _rs_pin = rs;
-    _rw_pin = rw;
-    _enable_pin = enable;
-
-    _data_pins[0] = d0;
-    _data_pins[1] = d1;
-    _data_pins[2] = d2;
-    _data_pins[3] = d3;
-    _data_pins[4] = d4;
-    _data_pins[5] = d5;
-    _data_pins[6] = d6;
-    _data_pins[7] = d7;
-
-    _led_a = led_a;
-
-    if (fourbitmode)
-      _displayfunction = LCD_4BITMODE | LCD_1LINE | LCD_5x8DOTS;
-    else
-      _displayfunction = LCD_8BITMODE | LCD_1LINE | LCD_5x8DOTS;
-
-    begin(16, 1);
   }
 
   void begin(uint8_t cols, uint8_t lines, uint8_t dotsize = LCD_5x8DOTS) {
@@ -505,8 +478,34 @@ public:
   }
 
 protected:
-  /************ low level data pushing commands **********/
+  void init(uint8_t fourbitmode, uint8_t rs, uint8_t rw, uint8_t enable,
+            uint8_t d0, uint8_t d1, uint8_t d2, uint8_t d3, uint8_t d4,
+            uint8_t d5, uint8_t d6, uint8_t d7, uint8_t led_a,
+            AbstractLCDDriver &driver = defaultDriver) {
 
+    p_driver = &driver;
+    _rs_pin = rs;
+    _rw_pin = rw;
+    _enable_pin = enable;
+
+    _data_pins[0] = d0;
+    _data_pins[1] = d1;
+    _data_pins[2] = d2;
+    _data_pins[3] = d3;
+    _data_pins[4] = d4;
+    _data_pins[5] = d5;
+    _data_pins[6] = d6;
+    _data_pins[7] = d7;
+
+    _led_a = led_a;
+
+    if (fourbitmode)
+      _displayfunction = LCD_4BITMODE | LCD_1LINE | LCD_5x8DOTS;
+    else
+      _displayfunction = LCD_8BITMODE | LCD_1LINE | LCD_5x8DOTS;
+
+    begin(16, 1);
+  }
   // write either command or data, with automatic 4/8-bit selection
   void send(uint8_t value, uint8_t mode) {
     digitalWriteLCD(_rs_pin, mode);
@@ -564,24 +563,23 @@ protected:
   AbstractLCDDriver *p_driver = nullptr;
 };
 
-
-
 /**
  * @brief Control LCD Display using I2C module
- * 
+ *
  */
 class LCD_I2C : public CommonLCD {
 public:
-  LCD_I2C(uint8_t lcd_addr, uint8_t lcd_cols, uint8_t lcd_rows,
-          uint8_t charsize) {
+  LCD_I2C(uint8_t lcd_addr) {
     _addr = lcd_addr;
-    _cols = lcd_cols;
-    _rows = lcd_rows;
-    _charsize = charsize;
     _backlightval = LCD_BACKLIGHT;
   }
 
-  void begin() {
+  void begin(uint8_t lcd_cols, uint8_t lcd_rows,
+             uint8_t charsize = LCD_5x8DOTS) {
+    _cols = lcd_cols;
+    _rows = lcd_rows;
+    _charsize = charsize;
+
     Wire.begin();
     _displayfunction = LCD_4BITMODE | LCD_1LINE | LCD_5x8DOTS;
 
@@ -715,7 +713,6 @@ protected:
     print(c);
   }
 };
-
 
 /**
  * @brief LCDBarGraph is class for displaying analog values in LCD display,

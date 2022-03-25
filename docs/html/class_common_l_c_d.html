@@ -64,6 +64,7 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pro-methods">Protected Member Functions</a> &#124;
 <a href="#pro-attribs">Protected Attributes</a> &#124;
 <a href="#pro-static-attribs">Static Protected Attributes</a> &#124;
 <a href="class_common_l_c_d-members.html">List of all members</a>  </div>
@@ -142,15 +143,22 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>createChar</b> (uint8
 <tr class="memitem:ad610acc8729cb3064fe3deaa1def193a"><td class="memItemLeft" align="right" valign="top"><a id="ad610acc8729cb3064fe3deaa1def193a" name="ad610acc8729cb3064fe3deaa1def193a"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>createChar</b> (uint8_t location, uint8_t charmap[])</td></tr>
 <tr class="separator:ad610acc8729cb3064fe3deaa1def193a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a11b7e4622a77ddb2450afe10bd0c6468"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_common_l_c_d.html#a11b7e4622a77ddb2450afe10bd0c6468">begin</a> (uint8_t lcd_cols, uint8_t lcd_rows, uint8_t charsize=LCD_5x8DOTS)=0</td></tr>
+<tr class="memdesc:a11b7e4622a77ddb2450afe10bd0c6468"><td class="mdescLeft">&#160;</td><td class="mdescRight">Starts the processing by defining the number of columns and rows.  <a href="class_common_l_c_d.html#a11b7e4622a77ddb2450afe10bd0c6468">More...</a><br /></td></tr>
+<tr class="separator:a11b7e4622a77ddb2450afe10bd0c6468"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7bd23d742dc7a9533b94a35d001746e2"><td class="memItemLeft" align="right" valign="top"><a id="a7bd23d742dc7a9533b94a35d001746e2" name="a7bd23d742dc7a9533b94a35d001746e2"></a>
+size_t&#160;</td><td class="memItemRight" valign="bottom"><b>write</b> (uint8_t value)</td></tr>
+<tr class="memdesc:a7bd23d742dc7a9533b94a35d001746e2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Output of a single char. <br /></td></tr>
+<tr class="separator:a7bd23d742dc7a9533b94a35d001746e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1aac61c7d19a3717aa7e2ac13345dc89"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_common_l_c_d.html#a1aac61c7d19a3717aa7e2ac13345dc89">setBrightness</a> (uint16_t percent)</td></tr>
+<tr class="memdesc:a1aac61c7d19a3717aa7e2ac13345dc89"><td class="mdescLeft">&#160;</td><td class="mdescRight">Defines the brightness (0-100)  <a href="class_common_l_c_d.html#a1aac61c7d19a3717aa7e2ac13345dc89">More...</a><br /></td></tr>
+<tr class="separator:a1aac61c7d19a3717aa7e2ac13345dc89"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-methods" name="pro-methods"></a>
+Protected Member Functions</h2></td></tr>
 <tr class="memitem:a64510e07c4d23ba32a8bb0c653247e3d"><td class="memItemLeft" align="right" valign="top"><a id="a64510e07c4d23ba32a8bb0c653247e3d" name="a64510e07c4d23ba32a8bb0c653247e3d"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>command</b> (uint8_t value)</td></tr>
 <tr class="separator:a64510e07c4d23ba32a8bb0c653247e3d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7bd23d742dc7a9533b94a35d001746e2"><td class="memItemLeft" align="right" valign="top"><a id="a7bd23d742dc7a9533b94a35d001746e2" name="a7bd23d742dc7a9533b94a35d001746e2"></a>
-size_t&#160;</td><td class="memItemRight" valign="bottom"><b>write</b> (uint8_t value)</td></tr>
-<tr class="separator:a7bd23d742dc7a9533b94a35d001746e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a11b7e4622a77ddb2450afe10bd0c6468"><td class="memItemLeft" align="right" valign="top"><a id="a11b7e4622a77ddb2450afe10bd0c6468" name="a11b7e4622a77ddb2450afe10bd0c6468"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>begin</b> (uint8_t lcd_cols, uint8_t lcd_rows, uint8_t charsize=LCD_5x8DOTS)=0</td></tr>
-<tr class="separator:a11b7e4622a77ddb2450afe10bd0c6468"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aedb4f6742fdbadea5f20d16219b1fb91"><td class="memItemLeft" align="right" valign="top"><a id="aedb4f6742fdbadea5f20d16219b1fb91" name="aedb4f6742fdbadea5f20d16219b1fb91"></a>
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>delayMicrosecondsLCD</b> (uint16_t ms)=0</td></tr>
 <tr class="separator:aedb4f6742fdbadea5f20d16219b1fb91"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -238,6 +246,9 @@ uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>_displaycontrol</b
 <tr class="memitem:a16e2e51880e160981a788f968b69efe5"><td class="memItemLeft" align="right" valign="top"><a id="a16e2e51880e160981a788f968b69efe5" name="a16e2e51880e160981a788f968b69efe5"></a>
 uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>_numlines</b></td></tr>
 <tr class="separator:a16e2e51880e160981a788f968b69efe5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a00f38335fdc374b8e82d827a78ec71c8"><td class="memItemLeft" align="right" valign="top"><a id="a00f38335fdc374b8e82d827a78ec71c8" name="a00f38335fdc374b8e82d827a78ec71c8"></a>
+uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>_led_a</b></td></tr>
+<tr class="separator:a00f38335fdc374b8e82d827a78ec71c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-static-attribs" name="pro-static-attribs"></a>
 Static Protected Attributes</h2></td></tr>
@@ -262,7 +273,84 @@ static const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>LCD_5
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p >Output to <a class="el" href="class_l_c_d.html" title="Output to LCD.">LCD</a> - Common Functionality. </p>
-</div><hr/>The documentation for this class was generated from the following file:<ul>
+</div><h2 class="groupheader">Member Function Documentation</h2>
+<a id="a11b7e4622a77ddb2450afe10bd0c6468" name="a11b7e4622a77ddb2450afe10bd0c6468"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a11b7e4622a77ddb2450afe10bd0c6468">&#9670;&nbsp;</a></span>begin()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void CommonLCD::begin </td>
+          <td>(</td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>lcd_cols</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>lcd_rows</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>charsize</em> = <code>LCD_5x8DOTS</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Starts the processing by defining the number of columns and rows. </p>
+
+<p>Implemented in <a class="el" href="class_l_c_d.html#ac85e9b9d58144ee68d5db46cdd9426a4">LCD</a>, and <a class="el" href="class_l_c_d___i2_c.html#a5c988b7850e89dfe524bcaab1878f868">LCD_I2C</a>.</p>
+
+</div>
+</div>
+<a id="a1aac61c7d19a3717aa7e2ac13345dc89" name="a1aac61c7d19a3717aa7e2ac13345dc89"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1aac61c7d19a3717aa7e2ac13345dc89">&#9670;&nbsp;</a></span>setBrightness()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void CommonLCD::setBrightness </td>
+          <td>(</td>
+          <td class="paramtype">uint16_t&#160;</td>
+          <td class="paramname"><em>percent</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Defines the brightness (0-100) </p>
+
+<p>Reimplemented in <a class="el" href="class_l_c_d.html#a67f459f9e13e3d31e0c7020ef12e306c">LCD</a>.</p>
+
+</div>
+</div>
+<hr/>The documentation for this class was generated from the following file:<ul>
 <li>src/<a class="el" href="_l_c_d_8h_source.html">LCD.h</a></li>
 </ul>
 </div><!-- contents -->

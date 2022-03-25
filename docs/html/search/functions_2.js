@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['setbrightness_0',['setBrightness',['../class_l_c_d.html#a3c2b0f541794fdffca501e4be962a54b',1,'LCD']]]
+  ['lcdbargraph_0',['LCDBarGraph',['../class_l_c_d_bar_graph.html#ac1f1cad334f0148dfbdb6f1f1a25736a',1,'LCDBarGraph']]]
 ];

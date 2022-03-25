@@ -266,17 +266,23 @@ public:
     }
   }
 
-  /*********** mid level commands, for sending data/cmds */
-
+  /// Starts the processing by defining the number of columns and rows
   virtual void begin(uint8_t lcd_cols, uint8_t lcd_rows,
                      uint8_t charsize = LCD_5x8DOTS) = 0;
 
+  /// Output of a single char
   inline size_t write(uint8_t value) {
     send(value, HIGH);
     return 1; // assume success
   }
 
   using Print::write;
+
+  /// Defines the brightness (0-100)
+  virtual void setBrightness(uint16_t percent) {
+    int val = map(percent, 0, 100, 20, 225);
+    analogWrite(_led_a, val);
+  }
 
 protected:
   // commands
@@ -322,11 +328,11 @@ protected:
   uint8_t _displaymode;
   uint8_t _displaycontrol;
   uint8_t _numlines;
+  uint8_t _led_a; // LED brightness
 
   inline void command(uint8_t value) { send(value, LOW); }
   virtual void delayMicrosecondsLCD(uint16_t ms) = 0;
   virtual void send(uint8_t value, uint8_t mode) = 0;
-
 };
 
 /**
@@ -472,11 +478,18 @@ public:
   }
 
   /// Defines the brightness (0-100)
-  void setBrightness(int percent) {
+  void setBrightness(uint16_t percent) override {
     if (_led_a != 0) {
       p_driver->setBrightness(_led_a, percent);
     }
   }
+
+  // /// Obsolete
+  // void printstr(const char c[]) {
+  //   // This function is not identical to the function used for "real" I2C
+  //   // displays it's here so the user sketch doesn't have to be changed
+  //   print(c);
+  // }
 
 protected:
   void init(uint8_t fourbitmode, uint8_t rs, uint8_t rw, uint8_t enable,
@@ -556,7 +569,6 @@ protected:
   uint8_t _rw_pin;     // LOW: write to LCD.  HIGH: read from LCD.
   uint8_t _enable_pin; // activated by a HIGH pulse.
   uint8_t _data_pins[8];
-  uint8_t _led_a;
 
   uint8_t _displayfunction;
   uint8_t _initialized;
@@ -570,9 +582,10 @@ protected:
  */
 class LCD_I2C : public CommonLCD {
 public:
-  LCD_I2C(uint8_t lcd_addr) {
+  LCD_I2C(uint8_t lcd_addr, uint8_t led_a = 0) {
     _addr = lcd_addr;
     _backlightval = LCD_BACKLIGHT;
+    _led_a = led_a;
   }
 
   void begin(uint8_t lcd_cols, uint8_t lcd_rows,
@@ -700,18 +713,12 @@ protected:
     createChar(char_num, rows);
   }
 
-  void setBacklight(uint8_t new_val) {
+  void setBacklight(bool new_val) {
     if (new_val) {
       backlight(); // turn backlight on
     } else {
       noBacklight(); // turn backlight off
     }
-  }
-
-  void printstr(const char c[]) {
-    // This function is not identical to the function used for "real" I2C
-    // displays it's here so the user sketch doesn't have to be changed
-    print(c);
   }
 };
 

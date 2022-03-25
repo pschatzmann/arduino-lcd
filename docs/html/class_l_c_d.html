@@ -100,11 +100,11 @@ Public Member Functions</h2></td></tr>
 &#160;</td><td class="memItemRight" valign="bottom"><b>LCD</b> (uint8_t rs, uint8_t enable, uint8_t d0, uint8_t d1, uint8_t d2, uint8_t d3, uint8_t leda=0, <a class="el" href="struct_abstract_l_c_d_driver.html">AbstractLCDDriver</a> &amp;driver=defaultDriver)</td></tr>
 <tr class="separator:a04d6bf361ce845062a41a3017e25b2d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac85e9b9d58144ee68d5db46cdd9426a4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_l_c_d.html#ac85e9b9d58144ee68d5db46cdd9426a4">begin</a> (uint8_t cols, uint8_t lines, uint8_t dotsize=LCD_5x8DOTS)</td></tr>
+<tr class="memdesc:ac85e9b9d58144ee68d5db46cdd9426a4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Starts the processing by defining the number of columns and rows.  <a href="class_l_c_d.html#ac85e9b9d58144ee68d5db46cdd9426a4">More...</a><br /></td></tr>
 <tr class="separator:ac85e9b9d58144ee68d5db46cdd9426a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3c2b0f541794fdffca501e4be962a54b"><td class="memItemLeft" align="right" valign="top"><a id="a3c2b0f541794fdffca501e4be962a54b" name="a3c2b0f541794fdffca501e4be962a54b"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>setBrightness</b> (int percent)</td></tr>
-<tr class="memdesc:a3c2b0f541794fdffca501e4be962a54b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Defines the brightness (0-100) <br /></td></tr>
-<tr class="separator:a3c2b0f541794fdffca501e4be962a54b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a67f459f9e13e3d31e0c7020ef12e306c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_l_c_d.html#a67f459f9e13e3d31e0c7020ef12e306c">setBrightness</a> (uint16_t percent) override</td></tr>
+<tr class="memdesc:a67f459f9e13e3d31e0c7020ef12e306c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Defines the brightness (0-100)  <a href="class_l_c_d.html#a67f459f9e13e3d31e0c7020ef12e306c">More...</a><br /></td></tr>
+<tr class="separator:a67f459f9e13e3d31e0c7020ef12e306c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_class_common_l_c_d"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_class_common_l_c_d')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="class_common_l_c_d.html">CommonLCD</a></td></tr>
 <tr class="memitem:aadd396761543c13bbe0e6f0fc7e8db1e inherit pub_methods_class_common_l_c_d"><td class="memItemLeft" align="right" valign="top"><a id="aadd396761543c13bbe0e6f0fc7e8db1e" name="aadd396761543c13bbe0e6f0fc7e8db1e"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>setRowOffsets</b> (int row0, int row1, int row2, int row3)</td></tr>
@@ -160,21 +160,16 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>createChar</b> (uint8
 <tr class="memitem:ad610acc8729cb3064fe3deaa1def193a inherit pub_methods_class_common_l_c_d"><td class="memItemLeft" align="right" valign="top"><a id="ad610acc8729cb3064fe3deaa1def193a" name="ad610acc8729cb3064fe3deaa1def193a"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>createChar</b> (uint8_t location, uint8_t charmap[])</td></tr>
 <tr class="separator:ad610acc8729cb3064fe3deaa1def193a inherit pub_methods_class_common_l_c_d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a64510e07c4d23ba32a8bb0c653247e3d inherit pub_methods_class_common_l_c_d"><td class="memItemLeft" align="right" valign="top"><a id="a64510e07c4d23ba32a8bb0c653247e3d" name="a64510e07c4d23ba32a8bb0c653247e3d"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>command</b> (uint8_t value)</td></tr>
-<tr class="separator:a64510e07c4d23ba32a8bb0c653247e3d inherit pub_methods_class_common_l_c_d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a11b7e4622a77ddb2450afe10bd0c6468 inherit pub_methods_class_common_l_c_d"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_common_l_c_d.html#a11b7e4622a77ddb2450afe10bd0c6468">begin</a> (uint8_t lcd_cols, uint8_t lcd_rows, uint8_t charsize=LCD_5x8DOTS)=0</td></tr>
+<tr class="memdesc:a11b7e4622a77ddb2450afe10bd0c6468 inherit pub_methods_class_common_l_c_d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Starts the processing by defining the number of columns and rows.  <a href="class_common_l_c_d.html#a11b7e4622a77ddb2450afe10bd0c6468">More...</a><br /></td></tr>
+<tr class="separator:a11b7e4622a77ddb2450afe10bd0c6468 inherit pub_methods_class_common_l_c_d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7bd23d742dc7a9533b94a35d001746e2 inherit pub_methods_class_common_l_c_d"><td class="memItemLeft" align="right" valign="top"><a id="a7bd23d742dc7a9533b94a35d001746e2" name="a7bd23d742dc7a9533b94a35d001746e2"></a>
 size_t&#160;</td><td class="memItemRight" valign="bottom"><b>write</b> (uint8_t value)</td></tr>
+<tr class="memdesc:a7bd23d742dc7a9533b94a35d001746e2 inherit pub_methods_class_common_l_c_d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Output of a single char. <br /></td></tr>
 <tr class="separator:a7bd23d742dc7a9533b94a35d001746e2 inherit pub_methods_class_common_l_c_d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a11b7e4622a77ddb2450afe10bd0c6468 inherit pub_methods_class_common_l_c_d"><td class="memItemLeft" align="right" valign="top"><a id="a11b7e4622a77ddb2450afe10bd0c6468" name="a11b7e4622a77ddb2450afe10bd0c6468"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>begin</b> (uint8_t lcd_cols, uint8_t lcd_rows, uint8_t charsize=LCD_5x8DOTS)=0</td></tr>
-<tr class="separator:a11b7e4622a77ddb2450afe10bd0c6468 inherit pub_methods_class_common_l_c_d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aedb4f6742fdbadea5f20d16219b1fb91 inherit pub_methods_class_common_l_c_d"><td class="memItemLeft" align="right" valign="top"><a id="aedb4f6742fdbadea5f20d16219b1fb91" name="aedb4f6742fdbadea5f20d16219b1fb91"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>delayMicrosecondsLCD</b> (uint16_t ms)=0</td></tr>
-<tr class="separator:aedb4f6742fdbadea5f20d16219b1fb91 inherit pub_methods_class_common_l_c_d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a70a7dfef3bcf6608190e7aaa9e0b054a inherit pub_methods_class_common_l_c_d"><td class="memItemLeft" align="right" valign="top"><a id="a70a7dfef3bcf6608190e7aaa9e0b054a" name="a70a7dfef3bcf6608190e7aaa9e0b054a"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>send</b> (uint8_t value, uint8_t mode)=0</td></tr>
-<tr class="separator:a70a7dfef3bcf6608190e7aaa9e0b054a inherit pub_methods_class_common_l_c_d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1aac61c7d19a3717aa7e2ac13345dc89 inherit pub_methods_class_common_l_c_d"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_common_l_c_d.html#a1aac61c7d19a3717aa7e2ac13345dc89">setBrightness</a> (uint16_t percent)</td></tr>
+<tr class="memdesc:a1aac61c7d19a3717aa7e2ac13345dc89 inherit pub_methods_class_common_l_c_d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Defines the brightness (0-100)  <a href="class_common_l_c_d.html#a1aac61c7d19a3717aa7e2ac13345dc89">More...</a><br /></td></tr>
+<tr class="separator:a1aac61c7d19a3717aa7e2ac13345dc89 inherit pub_methods_class_common_l_c_d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-methods" name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
@@ -200,6 +195,16 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>digitalWriteLCD</b> (
 <tr class="separator:ae66bee3ef4105456153fdf3dff8d2c4c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0893d52f04e9786eac95c8dd75527a6c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_l_c_d.html#a0893d52f04e9786eac95c8dd75527a6c">delayMicrosecondsLCD</a> (uint16_t ms)</td></tr>
 <tr class="separator:a0893d52f04e9786eac95c8dd75527a6c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pro_methods_class_common_l_c_d"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_class_common_l_c_d')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="class_common_l_c_d.html">CommonLCD</a></td></tr>
+<tr class="memitem:a64510e07c4d23ba32a8bb0c653247e3d inherit pro_methods_class_common_l_c_d"><td class="memItemLeft" align="right" valign="top"><a id="a64510e07c4d23ba32a8bb0c653247e3d" name="a64510e07c4d23ba32a8bb0c653247e3d"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>command</b> (uint8_t value)</td></tr>
+<tr class="separator:a64510e07c4d23ba32a8bb0c653247e3d inherit pro_methods_class_common_l_c_d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aedb4f6742fdbadea5f20d16219b1fb91 inherit pro_methods_class_common_l_c_d"><td class="memItemLeft" align="right" valign="top"><a id="aedb4f6742fdbadea5f20d16219b1fb91" name="aedb4f6742fdbadea5f20d16219b1fb91"></a>
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>delayMicrosecondsLCD</b> (uint16_t ms)=0</td></tr>
+<tr class="separator:aedb4f6742fdbadea5f20d16219b1fb91 inherit pro_methods_class_common_l_c_d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a70a7dfef3bcf6608190e7aaa9e0b054a inherit pro_methods_class_common_l_c_d"><td class="memItemLeft" align="right" valign="top"><a id="a70a7dfef3bcf6608190e7aaa9e0b054a" name="a70a7dfef3bcf6608190e7aaa9e0b054a"></a>
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>send</b> (uint8_t value, uint8_t mode)=0</td></tr>
+<tr class="separator:a70a7dfef3bcf6608190e7aaa9e0b054a inherit pro_methods_class_common_l_c_d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-attribs" name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
@@ -215,9 +220,6 @@ uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>_enable_pin</b></t
 <tr class="memitem:a8a22e56b6146f36e22b85adee2f6a521"><td class="memItemLeft" align="right" valign="top"><a id="a8a22e56b6146f36e22b85adee2f6a521" name="a8a22e56b6146f36e22b85adee2f6a521"></a>
 uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>_data_pins</b> [8]</td></tr>
 <tr class="separator:a8a22e56b6146f36e22b85adee2f6a521"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a472ba066b0c415c2f0fffc2a6d04dc2a"><td class="memItemLeft" align="right" valign="top"><a id="a472ba066b0c415c2f0fffc2a6d04dc2a" name="a472ba066b0c415c2f0fffc2a6d04dc2a"></a>
-uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>_led_a</b></td></tr>
-<tr class="separator:a472ba066b0c415c2f0fffc2a6d04dc2a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aef093ba3f8e1016267b40ac235a0fa0f"><td class="memItemLeft" align="right" valign="top"><a id="aef093ba3f8e1016267b40ac235a0fa0f" name="aef093ba3f8e1016267b40ac235a0fa0f"></a>
 uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>_displayfunction</b></td></tr>
 <tr class="separator:aef093ba3f8e1016267b40ac235a0fa0f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -306,6 +308,9 @@ uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>_displaycontrol</b
 <tr class="memitem:a16e2e51880e160981a788f968b69efe5 inherit pro_attribs_class_common_l_c_d"><td class="memItemLeft" align="right" valign="top"><a id="a16e2e51880e160981a788f968b69efe5" name="a16e2e51880e160981a788f968b69efe5"></a>
 uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>_numlines</b></td></tr>
 <tr class="separator:a16e2e51880e160981a788f968b69efe5 inherit pro_attribs_class_common_l_c_d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a00f38335fdc374b8e82d827a78ec71c8 inherit pro_attribs_class_common_l_c_d"><td class="memItemLeft" align="right" valign="top"><a id="a00f38335fdc374b8e82d827a78ec71c8" name="a00f38335fdc374b8e82d827a78ec71c8"></a>
+uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>_led_a</b></td></tr>
+<tr class="separator:a00f38335fdc374b8e82d827a78ec71c8 inherit pro_attribs_class_common_l_c_d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="inherited" name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
@@ -345,19 +350,19 @@ static const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>LCD_5
           <td class="memname">void LCD::begin </td>
           <td>(</td>
           <td class="paramtype">uint8_t&#160;</td>
-          <td class="paramname"><em>cols</em>, </td>
+          <td class="paramname"><em>lcd_cols</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">uint8_t&#160;</td>
-          <td class="paramname"><em>lines</em>, </td>
+          <td class="paramname"><em>lcd_rows</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">uint8_t&#160;</td>
-          <td class="paramname"><em>dotsize</em> = <code>LCD_5x8DOTS</code>&#160;</td>
+          <td class="paramname"><em>charsize</em> = <code>LCD_5x8DOTS</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -372,7 +377,9 @@ static const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>LCD_5
 </table>
 </div><div class="memdoc">
 
-<p>Implements <a class="el" href="class_common_l_c_d.html">CommonLCD</a>.</p>
+<p>Starts the processing by defining the number of columns and rows. </p>
+
+<p>Implements <a class="el" href="class_common_l_c_d.html#a11b7e4622a77ddb2450afe10bd0c6468">CommonLCD</a>.</p>
 
 </div>
 </div>
@@ -439,6 +446,36 @@ static const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>LCD_5
 </div><div class="memdoc">
 
 <p>Implements <a class="el" href="class_common_l_c_d.html">CommonLCD</a>.</p>
+
+</div>
+</div>
+<a id="a67f459f9e13e3d31e0c7020ef12e306c" name="a67f459f9e13e3d31e0c7020ef12e306c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a67f459f9e13e3d31e0c7020ef12e306c">&#9670;&nbsp;</a></span>setBrightness()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void LCD::setBrightness </td>
+          <td>(</td>
+          <td class="paramtype">uint16_t&#160;</td>
+          <td class="paramname"><em>percent</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Defines the brightness (0-100) </p>
+
+<p>Reimplemented from <a class="el" href="class_common_l_c_d.html#a1aac61c7d19a3717aa7e2ac13345dc89">CommonLCD</a>.</p>
 
 </div>
 </div>

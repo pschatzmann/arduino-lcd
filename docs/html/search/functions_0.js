@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['drawvalue_0',['drawValue',['../class_l_c_d_bar_graph.html#a5a5e9106237aa34e68ae8f3d1ef2b267',1,'LCDBarGraph']]]
+  ['begin_0',['begin',['../class_common_l_c_d.html#a11b7e4622a77ddb2450afe10bd0c6468',1,'CommonLCD::begin()'],['../class_l_c_d.html#ac85e9b9d58144ee68d5db46cdd9426a4',1,'LCD::begin()'],['../class_l_c_d___i2_c.html#a5c988b7850e89dfe524bcaab1878f868',1,'LCD_I2C::begin()']]]
 ];

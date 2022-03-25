@@ -2,6 +2,7 @@
 
 #include "Arduino.h"
 #include "Print.h"
+#include <Wire.h>
 #include <inttypes.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -109,10 +110,179 @@ protected:
 
 /**
  * @brief Output to LCD
- * 
+ *
  */
+class CommonLCD : public Print {
 
-class LCD : public Print {
+public:
+  void setRowOffsets(int row0, int row1, int row2, int row3) {
+    _row_offsets[0] = row0;
+    _row_offsets[1] = row1;
+    _row_offsets[2] = row2;
+    _row_offsets[3] = row3;
+  }
+
+  /********** high level commands, for the user! */
+  void clear() {
+    command(LCD_CLEARDISPLAY);  // clear display, set cursor position to zero
+    delayMicrosecondsLCD(2000); // this command takes a long time!
+  }
+
+  void home() {
+    command(LCD_RETURNHOME);    // set cursor position to zero
+    delayMicrosecondsLCD(2000); // this command takes a long time!
+  }
+
+  void setCursor(uint8_t col, uint8_t row) {
+    const size_t max_lines = sizeof(_row_offsets) / sizeof(*_row_offsets);
+    if (row >= max_lines) {
+      row = max_lines - 1; // we count rows starting w/ 0
+    }
+    if (row >= _numlines) {
+      row = _numlines - 1; // we count rows starting w/ 0
+    }
+
+    command(LCD_SETDDRAMADDR | (col + _row_offsets[row]));
+  }
+
+  // Turn the display on/off (quickly)
+  void noDisplay() {
+    _displaycontrol &= ~LCD_DISPLAYON;
+    command(LCD_DISPLAYCONTROL | _displaycontrol);
+  }
+  void display() {
+    _displaycontrol |= LCD_DISPLAYON;
+    command(LCD_DISPLAYCONTROL | _displaycontrol);
+  }
+
+  // Turns the underline cursor on/off
+  void noCursor() {
+    _displaycontrol &= ~LCD_CURSORON;
+    command(LCD_DISPLAYCONTROL | _displaycontrol);
+  }
+
+  void cursor() {
+    _displaycontrol |= LCD_CURSORON;
+    command(LCD_DISPLAYCONTROL | _displaycontrol);
+  }
+
+  // Turn on and off the blinking cursor
+  void noBlink() {
+    _displaycontrol &= ~LCD_BLINKON;
+    command(LCD_DISPLAYCONTROL | _displaycontrol);
+  }
+  void blink() {
+    _displaycontrol |= LCD_BLINKON;
+    command(LCD_DISPLAYCONTROL | _displaycontrol);
+  }
+
+  // These commands scroll the display without changing the RAM
+  void scrollDisplayLeft(void) {
+    command(LCD_CURSORSHIFT | LCD_DISPLAYMOVE | LCD_MOVELEFT);
+  }
+  void scrollDisplayRight(void) {
+    command(LCD_CURSORSHIFT | LCD_DISPLAYMOVE | LCD_MOVERIGHT);
+  }
+
+  // This is for text that flows Left to Right
+  void leftToRight(void) {
+    _displaymode |= LCD_ENTRYLEFT;
+    command(LCD_ENTRYMODESET | _displaymode);
+  }
+
+  // This is for text that flows Right to Left
+  void rightToLeft(void) {
+    _displaymode &= ~LCD_ENTRYLEFT;
+    command(LCD_ENTRYMODESET | _displaymode);
+  }
+
+  // This will 'right justify' text from the cursor
+  void autoscroll(void) {
+    _displaymode |= LCD_ENTRYSHIFTINCREMENT;
+    command(LCD_ENTRYMODESET | _displaymode);
+  }
+
+  // This will 'left justify' text from the cursor
+  void noAutoscroll(void) {
+    _displaymode &= ~LCD_ENTRYSHIFTINCREMENT;
+    command(LCD_ENTRYMODESET | _displaymode);
+  }
+
+  void createChar(uint8_t location, const uint8_t charmap[]) {
+    createChar(location, (uint8_t *)charmap);
+  }
+
+  // Allows us to fill the first 8 CGRAM locations
+  // with custom characters
+  void createChar(uint8_t location, uint8_t charmap[]) {
+    location &= 0x7; // we only have 8 locations 0-7
+    command(LCD_SETCGRAMADDR | (location << 3));
+    for (int i = 0; i < 8; i++) {
+      write(charmap[i]);
+    }
+  }
+
+  /*********** mid level commands, for sending data/cmds */
+
+  inline void command(uint8_t value) { send(value, LOW); }
+
+  inline size_t write(uint8_t value) {
+    send(value, HIGH);
+    return 1; // assume success
+  }
+
+  using Print::write;
+
+  virtual void delayMicrosecondsLCD(uint16_t ms) = 0;
+  virtual void send(uint8_t value, uint8_t mode) = 0;
+
+protected:
+  // commands
+  const uint8_t LCD_CLEARDISPLAY = 0x01;
+  const uint8_t LCD_RETURNHOME = 0x02;
+  const uint8_t LCD_ENTRYMODESET = 0x04;
+  const uint8_t LCD_DISPLAYCONTROL = 0x08;
+  const uint8_t LCD_CURSORSHIFT = 0x10;
+  const uint8_t LCD_FUNCTIONSET = 0x20;
+  const uint8_t LCD_SETCGRAMADDR = 0x40;
+  const uint8_t LCD_SETDDRAMADDR = 0x80;
+
+  // flags for display entry mode
+  const uint8_t LCD_ENTRYRIGHT = 0x00;
+  const uint8_t LCD_ENTRYLEFT = 0x02;
+  const uint8_t LCD_ENTRYSHIFTINCREMENT = 0x01;
+  const uint8_t LCD_ENTRYSHIFTDECREMENT = 0x00;
+
+  // flags for display on/off control
+  const uint8_t LCD_DISPLAYON = 0x04;
+  const uint8_t LCD_DISPLAYOFF = 0x00;
+  const uint8_t LCD_CURSORON = 0x02;
+  const uint8_t LCD_CURSOROFF = 0x00;
+  const uint8_t LCD_BLINKON = 0x01;
+  const uint8_t LCD_BLINKOFF = 0x00;
+
+  // flags for display/cursor shift
+  const uint8_t LCD_DISPLAYMOVE = 0x08;
+  const uint8_t LCD_CURSORMOVE = 0x00;
+  const uint8_t LCD_MOVERIGHT = 0x04;
+  const uint8_t LCD_MOVELEFT = 0x00;
+
+  // flags for function set
+  static const uint8_t LCD_8BITMODE = 0x10;
+  static const uint8_t LCD_4BITMODE = 0x00;
+  static const uint8_t LCD_2LINE = 0x08;
+  static const uint8_t LCD_1LINE = 0x00;
+  static const uint8_t LCD_5x10DOTS = 0x04;
+  static const uint8_t LCD_5x8DOTS = 0x00;
+
+  // variables
+  uint8_t _row_offsets[4];
+  uint8_t _displaymode;
+  uint8_t _displaycontrol;
+  uint8_t _numlines;
+};
+
+class LCD : public CommonLCD {
 public:
   // When the display powers up, it is configured as follows:
   //
@@ -279,130 +449,12 @@ public:
     command(LCD_ENTRYMODESET | _displaymode);
   }
 
-  void setRowOffsets(int row0, int row1, int row2, int row3) {
-    _row_offsets[0] = row0;
-    _row_offsets[1] = row1;
-    _row_offsets[2] = row2;
-    _row_offsets[3] = row3;
-  }
-
-  /********** high level commands, for the user! */
-  void clear() {
-    command(LCD_CLEARDISPLAY);  // clear display, set cursor position to zero
-    delayMicrosecondsLCD(2000); // this command takes a long time!
-  }
-
-  void home() {
-    command(LCD_RETURNHOME);    // set cursor position to zero
-    delayMicrosecondsLCD(2000); // this command takes a long time!
-  }
-
-  void setCursor(uint8_t col, uint8_t row) {
-    const size_t max_lines = sizeof(_row_offsets) / sizeof(*_row_offsets);
-    if (row >= max_lines) {
-      row = max_lines - 1; // we count rows starting w/ 0
-    }
-    if (row >= _numlines) {
-      row = _numlines - 1; // we count rows starting w/ 0
-    }
-
-    command(LCD_SETDDRAMADDR | (col + _row_offsets[row]));
-  }
-
-  // Turn the display on/off (quickly)
-  void noDisplay() {
-    _displaycontrol &= ~LCD_DISPLAYON;
-    command(LCD_DISPLAYCONTROL | _displaycontrol);
-  }
-  void display() {
-    _displaycontrol |= LCD_DISPLAYON;
-    command(LCD_DISPLAYCONTROL | _displaycontrol);
-  }
-
-  // Turns the underline cursor on/off
-  void noCursor() {
-    _displaycontrol &= ~LCD_CURSORON;
-    command(LCD_DISPLAYCONTROL | _displaycontrol);
-  }
-
-  void cursor() {
-    _displaycontrol |= LCD_CURSORON;
-    command(LCD_DISPLAYCONTROL | _displaycontrol);
-  }
-
-  // Turn on and off the blinking cursor
-  void noBlink() {
-    _displaycontrol &= ~LCD_BLINKON;
-    command(LCD_DISPLAYCONTROL | _displaycontrol);
-  }
-  void blink() {
-    _displaycontrol |= LCD_BLINKON;
-    command(LCD_DISPLAYCONTROL | _displaycontrol);
-  }
-
-  // These commands scroll the display without changing the RAM
-  void scrollDisplayLeft(void) {
-    command(LCD_CURSORSHIFT | LCD_DISPLAYMOVE | LCD_MOVELEFT);
-  }
-  void scrollDisplayRight(void) {
-    command(LCD_CURSORSHIFT | LCD_DISPLAYMOVE | LCD_MOVERIGHT);
-  }
-
-  // This is for text that flows Left to Right
-  void leftToRight(void) {
-    _displaymode |= LCD_ENTRYLEFT;
-    command(LCD_ENTRYMODESET | _displaymode);
-  }
-
-  // This is for text that flows Right to Left
-  void rightToLeft(void) {
-    _displaymode &= ~LCD_ENTRYLEFT;
-    command(LCD_ENTRYMODESET | _displaymode);
-  }
-
-  // This will 'right justify' text from the cursor
-  void autoscroll(void) {
-    _displaymode |= LCD_ENTRYSHIFTINCREMENT;
-    command(LCD_ENTRYMODESET | _displaymode);
-  }
-
-  // This will 'left justify' text from the cursor
-  void noAutoscroll(void) {
-    _displaymode &= ~LCD_ENTRYSHIFTINCREMENT;
-    command(LCD_ENTRYMODESET | _displaymode);
-  }
-
-  void createChar(uint8_t location, const uint8_t charmap[]) {
-    createChar(location, (uint8_t *)charmap);
-  }
-
-  // Allows us to fill the first 8 CGRAM locations
-  // with custom characters
-  void createChar(uint8_t location, uint8_t charmap[]) {
-    location &= 0x7; // we only have 8 locations 0-7
-    command(LCD_SETCGRAMADDR | (location << 3));
-    for (int i = 0; i < 8; i++) {
-      write(charmap[i]);
-    }
-  }
-
   /// Defines the brightness (0-100)
   void setBrightness(int percent) {
     if (_led_a != 0) {
       p_driver->setBrightness(_led_a, percent);
     }
   }
-
-  /*********** mid level commands, for sending data/cmds */
-
-  inline void command(uint8_t value) { send(value, LOW); }
-
-  inline size_t write(uint8_t value) {
-    send(value, HIGH);
-    return 1; // assume success
-  }
-
-  using Print::write;
 
 protected:
   /************ low level data pushing commands **********/
@@ -451,44 +503,6 @@ protected:
 
   void delayMicrosecondsLCD(uint16_t ms) { p_driver->delayMicrosecondsLCD(ms); }
 
-  // commands
-  const uint8_t LCD_CLEARDISPLAY = 0x01;
-  const uint8_t LCD_RETURNHOME = 0x02;
-  const uint8_t LCD_ENTRYMODESET = 0x04;
-  const uint8_t LCD_DISPLAYCONTROL = 0x08;
-  const uint8_t LCD_CURSORSHIFT = 0x10;
-  const uint8_t LCD_FUNCTIONSET = 0x20;
-  const uint8_t LCD_SETCGRAMADDR = 0x40;
-  const uint8_t LCD_SETDDRAMADDR = 0x80;
-
-  // flags for display entry mode
-  const uint8_t LCD_ENTRYRIGHT = 0x00;
-  const uint8_t LCD_ENTRYLEFT = 0x02;
-  const uint8_t LCD_ENTRYSHIFTINCREMENT = 0x01;
-  const uint8_t LCD_ENTRYSHIFTDECREMENT = 0x00;
-
-  // flags for display on/off control
-  const uint8_t LCD_DISPLAYON = 0x04;
-  const uint8_t LCD_DISPLAYOFF = 0x00;
-  const uint8_t LCD_CURSORON = 0x02;
-  const uint8_t LCD_CURSOROFF = 0x00;
-  const uint8_t LCD_BLINKON = 0x01;
-  const uint8_t LCD_BLINKOFF = 0x00;
-
-  // flags for display/cursor shift
-  const uint8_t LCD_DISPLAYMOVE = 0x08;
-  const uint8_t LCD_CURSORMOVE = 0x00;
-  const uint8_t LCD_MOVERIGHT = 0x04;
-  const uint8_t LCD_MOVELEFT = 0x00;
-
-  // flags for function set
-  static const uint8_t LCD_8BITMODE = 0x10;
-  static const uint8_t LCD_4BITMODE = 0x00;
-  static const uint8_t LCD_2LINE = 0x08;
-  static const uint8_t LCD_1LINE = 0x00;
-  static const uint8_t LCD_5x10DOTS = 0x04;
-  static const uint8_t LCD_5x8DOTS = 0x00;
-
   // variables
   uint8_t _rs_pin;     // LOW: command.  HIGH: character.
   uint8_t _rw_pin;     // LOW: write to LCD.  HIGH: read from LCD.
@@ -497,15 +511,159 @@ protected:
   uint8_t _led_a;
 
   uint8_t _displayfunction;
-  uint8_t _displaycontrol;
-  uint8_t _displaymode;
-
   uint8_t _initialized;
 
-  uint8_t _numlines;
-  uint8_t _row_offsets[4];
-
   AbstractLCDDriver *p_driver = nullptr;
+};
+
+/**
+ * @brief Control LCD Display using I2C module
+ * 
+ */
+class LCD_I2C : public CommonLCD {
+public:
+  LCD_I2C(uint8_t lcd_addr, uint8_t lcd_cols, uint8_t lcd_rows,
+          uint8_t charsize) {
+    _addr = lcd_addr;
+    _cols = lcd_cols;
+    _rows = lcd_rows;
+    _charsize = charsize;
+    _backlightval = LCD_BACKLIGHT;
+  }
+
+  void begin() {
+    Wire.begin();
+    _displayfunction = LCD_4BITMODE | LCD_1LINE | LCD_5x8DOTS;
+
+    if (_rows > 1) {
+      _displayfunction |= LCD_2LINE;
+    }
+
+    // for some 1 line displays you can select a 10 pixel high font
+    if ((_charsize != 0) && (_rows == 1)) {
+      _displayfunction |= LCD_5x10DOTS;
+    }
+
+    // SEE PAGE 45/46 FOR INITIALIZATION SPECIFICATION!
+    // according to datasheet, we need at least 40ms after power rises
+    // above 2.7V before sending commands. Arduino can turn on way befer 4.5V so
+    // we'll wait 50
+    delay(50);
+
+    // Now we pull both RS and R/W low to begin commands
+    expanderWrite(
+        _backlightval); // reset expanderand turn backlight off (Bit 8 =1)
+    delay(1000);
+
+    // put the LCD into 4 bit mode
+    //  this is according to the hitachi HD44780 datasheet
+    //  figure 24, pg 46
+
+    // we start in 8bit mode, try to set 4 bit mode
+    write4bits(0x03 << 4);
+    delayMicroseconds(4500); // wait min 4.1ms
+
+    // second try
+    write4bits(0x03 << 4);
+    delayMicroseconds(4500); // wait min 4.1ms
+
+    // third go!
+    write4bits(0x03 << 4);
+    delayMicroseconds(150);
+
+    // finally, set to 4-bit interface
+    write4bits(0x02 << 4);
+
+    // set # lines, font size, etc.
+    command(LCD_FUNCTIONSET | _displayfunction);
+
+    // turn the display on with no cursor or blinking default
+    _displaycontrol = LCD_DISPLAYON | LCD_CURSOROFF | LCD_BLINKOFF;
+    display();
+
+    // clear it off
+    clear();
+
+    // Initialize to default text direction (for roman languages)
+    _displaymode = LCD_ENTRYLEFT | LCD_ENTRYSHIFTDECREMENT;
+
+    // set the entry mode
+    command(LCD_ENTRYMODESET | _displaymode);
+
+    home();
+  }
+
+  // Turn the (optional) backlight off/on
+  void noBacklight(void) {
+    _backlightval = LCD_NOBACKLIGHT;
+    expanderWrite(0);
+  }
+
+  void backlight(void) {
+    _backlightval = LCD_BACKLIGHT;
+    expanderWrite(0);
+  }
+  bool getBacklight() { return _backlightval == LCD_BACKLIGHT; }
+
+protected:
+  uint8_t _addr;
+  uint8_t _displaycontrol;
+  uint8_t _displayfunction;
+  uint8_t _displaymode;
+  uint8_t _cols;
+  uint8_t _rows;
+  uint8_t _charsize;
+  uint8_t _backlightval;
+
+  const uint8_t LCD_BACKLIGHT = 0x08;
+  const uint8_t LCD_NOBACKLIGHT = 0x00;
+  const uint8_t En = B00000100; // Enable bit
+  const uint8_t Rw = B00000010; // Read/Write bit
+  const uint8_t Rs = B00000001; // Register select bit
+
+  void send(uint8_t value, uint8_t mode) {
+    uint8_t highnib = value & 0xf0;
+    uint8_t lownib = (value << 4) & 0xf0;
+    write4bits((highnib) | mode);
+    write4bits((lownib) | mode);
+  }
+
+  void write4bits(uint8_t value) {
+    expanderWrite(value);
+    pulseEnable(value);
+  }
+
+  void expanderWrite(uint8_t _data) {
+    Wire.beginTransmission(_addr);
+    Wire.write((int)(_data) | _backlightval);
+    Wire.endTransmission();
+  }
+
+  void pulseEnable(uint8_t _data) {
+    expanderWrite(_data | En); // En high
+    delayMicroseconds(1);      // enable pulse must be >450ns
+
+    expanderWrite(_data & ~En); // En low
+    delayMicroseconds(50);      // commands need > 37us to settle
+  }
+
+  void load_custom_character(uint8_t char_num, uint8_t *rows) {
+    createChar(char_num, rows);
+  }
+
+  void setBacklight(uint8_t new_val) {
+    if (new_val) {
+      backlight(); // turn backlight on
+    } else {
+      noBacklight(); // turn backlight off
+    }
+  }
+
+  void printstr(const char c[]) {
+    // This function is not identical to the function used for "real" I2C
+    // displays it's here so the user sketch doesn't have to be changed
+    print(c);
+  }
 };
 
 /**
@@ -584,7 +742,7 @@ public:
    * position (column) of the bar. Zero based value. startY - Vertical starting
    * position (row) of the bar. Zero based value.
    */
-  LCDBarGraph(LCD &lcd, byte numCols, byte startX = 0, byte startY = 0) {
+  LCDBarGraph(CommonLCD &lcd, byte numCols, byte startX = 0, byte startY = 0) {
     // -- setting fields
     _lcd = &lcd;
     _numCols = numCols;
@@ -647,7 +805,7 @@ public:
   }
 
 private:
-  LCD *_lcd;
+  CommonLCD *_lcd;
   byte _numCols;
   byte _startX;
   byte _startY;

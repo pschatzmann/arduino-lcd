@@ -38,8 +38,8 @@ Using an I2C LCD Module
 
 // initialize the library by associating any needed LCD interface pin
 // with the Arduino pin number it is connected to
-const int rs = 12, en = 11, d4 = 5, d5 = 4, d6 = 3, d7 = 2;
-LCD lcd(0x27);
+// const int rs = 12, en = 11, d4 = 5, d5 = 4, d6 = 3, d7 = 2;
+LCD_I2C lcd(0x27);
 
 void setup() {
   // set up the LCD's number of columns and rows:

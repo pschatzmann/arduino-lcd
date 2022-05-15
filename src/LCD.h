@@ -331,7 +331,7 @@ class CommonLCD : public Print {
   uint8_t _led_a;  // LED brightness
 
   inline void command(uint8_t value) { send(value, LOW); }
-  virtual void delayMicrosecondsLCD(uint16_t ms) = 0;
+  virtual void delayMicrosecondsLCD(uint16_t ms)  { delayMicroseconds(ms); }
   virtual void send(uint8_t value, uint8_t mode) = 0;
 };
 
@@ -561,7 +561,7 @@ class LCD : public CommonLCD {
     p_driver->digitalWriteLCD(pin, value);
   }
 
-  void delayMicrosecondsLCD(uint16_t ms) { p_driver->delayMicrosecondsLCD(ms); }
+  void delayMicrosecondsLCD(uint16_t ms) override { p_driver->delayMicrosecondsLCD(ms); }
 
   // variables
   uint8_t _rs_pin;      // LOW: command.  HIGH: character.
@@ -576,8 +576,8 @@ class LCD : public CommonLCD {
 };
 
 /**
- * @brief Control LCD Display using I2C module
- *
+ * @brief Control LCD Display using I2C module. The Wire object nees to be set up
+ * separately.
  */
 class LCD_I2C : public CommonLCD {
  public:
@@ -585,6 +585,17 @@ class LCD_I2C : public CommonLCD {
     _addr = lcd_addr;
     _backlightval = LCD_BACKLIGHT;
     _led_a = led_a;
+    _p_wire = &Wire;
+  }
+
+  void setWire(TwoWire &wire){
+    _p_wire = &wire;
+  }
+
+  void begin(uint8_t lcd_cols, uint8_t lcd_rows,
+             uint8_t charsize, TwoWire &wire) {
+      setWire(wire);
+      begin(lcd_cols, lcd_rows, charsize);
   }
 
   void begin(uint8_t lcd_cols, uint8_t lcd_rows,
@@ -592,8 +603,10 @@ class LCD_I2C : public CommonLCD {
     _cols = lcd_cols;
     _rows = lcd_rows;
     _charsize = charsize;
+    if(_p_wire==nullptr){
+      _p_wire = &Wire;
+    }
 
-    Wire.begin();
     _displayfunction = LCD_4BITMODE | LCD_1LINE | LCD_5x8DOTS;
 
     if (_rows > 1) {
@@ -612,8 +625,7 @@ class LCD_I2C : public CommonLCD {
     delay(50);
 
     // Now we pull both RS and R/W low to begin commands
-    expanderWrite(
-        _backlightval);  // reset expanderand turn backlight off (Bit 8 =1)
+    expanderWrite(_backlightval);  // reset expanderand turn backlight off (Bit 8 =1)
     delay(1000);
 
     // put the LCD into 4 bit mode
@@ -622,15 +634,15 @@ class LCD_I2C : public CommonLCD {
 
     // we start in 8bit mode, try to set 4 bit mode
     write4bits(0x03 << 4);
-    delayMicroseconds(4500);  // wait min 4.1ms
+    delayMicrosecondsLCD(4500);  // wait min 4.1ms
 
     // second try
     write4bits(0x03 << 4);
-    delayMicroseconds(4500);  // wait min 4.1ms
+    delayMicrosecondsLCD(4500);  // wait min 4.1ms
 
     // third go!
     write4bits(0x03 << 4);
-    delayMicroseconds(150);
+    delayMicrosecondsLCD(150);
 
     // finally, set to 4-bit interface
     write4bits(0x02 << 4);
@@ -675,6 +687,7 @@ class LCD_I2C : public CommonLCD {
   uint8_t _rows;
   uint8_t _charsize;
   uint8_t _backlightval;
+  TwoWire *_p_wire=nullptr;
 
   const uint8_t LCD_BACKLIGHT = 0x08;
   const uint8_t LCD_NOBACKLIGHT = 0x00;
@@ -695,17 +708,17 @@ class LCD_I2C : public CommonLCD {
   }
 
   void expanderWrite(uint8_t _data) {
-    Wire.beginTransmission(_addr);
-    Wire.write((int)(_data) | _backlightval);
-    Wire.endTransmission();
+    _p_wire->beginTransmission(_addr);
+    _p_wire->write((int)(_data) | _backlightval);
+    _p_wire->endTransmission();
   }
 
   void pulseEnable(uint8_t _data) {
     expanderWrite(_data | En);  // En high
-    delayMicroseconds(1);       // enable pulse must be >450ns
+    delayMicrosecondsLCD(1);       // enable pulse must be >450ns
 
     expanderWrite(_data & ~En);  // En low
-    delayMicroseconds(50);       // commands need > 37us to settle
+    delayMicrosecondsLCD(50);       // commands need > 37us to settle
   }
 
   void load_custom_character(uint8_t char_num, uint8_t *rows) {
@@ -719,6 +732,9 @@ class LCD_I2C : public CommonLCD {
       noBacklight();  // turn backlight off
     }
   }
+  
+  void delayMicrosecondsLCD(uint16_t ms) override { delayMicroseconds(ms); }
+
 };
 
 /**

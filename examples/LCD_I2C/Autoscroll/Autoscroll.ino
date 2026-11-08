@@ -40,6 +40,7 @@ Using an I2C LCD Module
 //const int rs = 12, en = 11, d4 = 5, d5 = 4, d6 = 3, d7 = 2;
 LCD_I2C lcd(0x27);
 
+void setup() {
   // set up the LCD's number of columns and rows:
   lcd.begin(16, 2);
 }

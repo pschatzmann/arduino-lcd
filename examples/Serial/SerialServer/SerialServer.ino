@@ -12,7 +12,7 @@
 // include the library code:
 #include <LCD.h>
 
-LCDClient client(Serial);
+LCDServer server(Serial);
 
 void setup() {
   // Setup Serial 
@@ -20,5 +20,5 @@ void setup() {
 }
 
 void loop() {
-    client.process();
+    server.process();
 }

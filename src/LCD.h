@@ -9,24 +9,35 @@
 #include "Arduino.h"
 #include "Print.h"
 
+
 /**
  * @brief Supported (remote) Commands which are sent over the wire
  *
  */
-enum CmdEnum : uint8_t { UNDEFINED = 0, MODE, WRITE, DELAY, PULSE, BRIGHTNESS };
+enum class CmdEnum : uint8_t {
+  UNDEFINED = 0,
+  MODE,
+  WRITE,
+  DELAY,
+  PULSE,
+  BRIGHTNESS
+};
 
 /**
- * @brief Command structure which is sent over the wire
- *
+ * @brief Command structure which is sent over the wire. Each command starts
+ * with a sync byte so that the receiver can resynchronize after lost data.
  */
 struct __attribute__((__packed__)) Cmd {
+  static const uint8_t SYNC = 0xA5;
+
   Cmd() = default;
   Cmd(CmdEnum id, uint16_t p1, uint16_t p2 = 0) {
     this->id = id;
     this->p1 = p1;
     this->p2 = p2;
   }
-  CmdEnum id = UNDEFINED;
+  uint8_t sync = SYNC;
+  CmdEnum id = CmdEnum::UNDEFINED;
   uint16_t p1 = 0;
   uint16_t p2 = 0;
 };
@@ -36,11 +47,12 @@ struct __attribute__((__packed__)) Cmd {
  * the wire
  */
 struct AbstractLCDDriver {
-  virtual void pinModeLCD(uint16_t pin, uint16_t mode);
-  virtual void digitalWriteLCD(uint16_t pin, uint16_t value);
-  virtual void delayMicrosecondsLCD(uint16_t ms);
-  virtual void pulseEnable(uint16_t pin);
-  virtual void setBrightness(uint16_t pin, uint16_t percent);
+  virtual ~AbstractLCDDriver() = default;
+  virtual void pinModeLCD(uint16_t pin, uint16_t mode) = 0;
+  virtual void digitalWriteLCD(uint16_t pin, uint16_t value) = 0;
+  virtual void delayMicrosecondsLCD(uint16_t us) = 0;
+  virtual void pulseEnable(uint16_t pin) = 0;
+  virtual void setBrightness(uint16_t pin, uint16_t percent) = 0;
 };
 
 /**
@@ -53,104 +65,116 @@ struct LCDDriver : public AbstractLCDDriver {
     digitalWrite(pin, value);
   }
 
-  void delayMicrosecondsLCD(uint16_t ms) override { delayMicroseconds(ms); }
+  void delayMicrosecondsLCD(uint16_t us) override { delayMicroseconds(us); }
 
   void pulseEnable(uint16_t pin) override {
-    digitalWrite(pin, LOW);
+    digitalWriteLCD(pin, LOW);
     delayMicroseconds(1);
     digitalWriteLCD(pin, HIGH);
     delayMicroseconds(1);  // enable pulse must be >450 ns
-    digitalWrite(pin, LOW);
+    digitalWriteLCD(pin, LOW);
     delayMicroseconds(100);  // commands need >37 us to settle
   }
 
+  /// Sets the brightness of a PWM pin: 0 (off) to 100 (full)
   void setBrightness(uint16_t pin, uint16_t percent) override {
-    int val = map(percent, 0, 100, 20, 225);
-    analogWrite(pin, val);
+    if (percent > 100) percent = 100;
+    analogWrite(pin, (int)map(percent, 0, 100, 0, 255));
   }
+};
 
-} defaultDriver;
+/// Provides the default driver (created on first use, so that the header can
+/// be included from multiple source files).
+inline LCDDriver &defaultLCDDriver() {
+  static LCDDriver driver;
+  return driver;
+}
 
 /**
- * @brief Driver which sends the data over a Stream
- * (e.g. Serial Line)
+ * @brief Driver which sends the data over a Print (e.g. Serial Line)
  */
 struct LCDWriteDriver : public AbstractLCDDriver {
   LCDWriteDriver(Print &out) { p_out = &out; }
 
   void pinModeLCD(uint16_t pin, uint16_t mode) override {
-    Cmd cmd(MODE, pin, mode);
-    p_out->write((uint8_t *)&cmd, sizeof(cmd));
+    sendCmd(Cmd(CmdEnum::MODE, pin, mode));
   }
 
   void digitalWriteLCD(uint16_t pin, uint16_t value) override {
-    Cmd cmd(WRITE, pin, value);
-    p_out->write((uint8_t *)&cmd, sizeof(cmd));
+    sendCmd(Cmd(CmdEnum::WRITE, pin, value));
   }
 
-  void delayMicrosecondsLCD(uint16_t ms) override {
-    Cmd cmd(DELAY, ms);
-    p_out->write((uint8_t *)&cmd, sizeof(cmd));
+  void delayMicrosecondsLCD(uint16_t us) override {
+    sendCmd(Cmd(CmdEnum::DELAY, us));
   }
 
   void pulseEnable(uint16_t pin) override {
-    Cmd cmd(PULSE, pin);
-    p_out->write((uint8_t *)&cmd, sizeof(cmd));
+    sendCmd(Cmd(CmdEnum::PULSE, pin));
   }
 
   void setBrightness(uint16_t pin, uint16_t percent) override {
-    Cmd cmd(BRIGHTNESS, pin, percent);
-    p_out->write((uint8_t *)&cmd, sizeof(cmd));
+    sendCmd(Cmd(CmdEnum::BRIGHTNESS, pin, percent));
   }
 
  protected:
   Print *p_out;
-  static const int len = 80;
-  char buffer[len];
+
+  void sendCmd(const Cmd &cmd) {
+    p_out->write((const uint8_t *)&cmd, sizeof(cmd));
+  }
 };
 
 /**
- * @brief LCDClient which processes the request provided by the indicated Stream
- * in the Arduino loop call process().
+ * @brief LCDServer receives the commands sent by the LCDWriteDriver from the
+ * indicated Stream and executes them on the local pins. Call process() in the
+ * Arduino loop.
  */
-class LCDClient {
-  LCDClient(Stream &in) { p_in = &in; };
+class LCDServer {
+ public:
+  LCDServer(Stream &in) { p_in = &in; }
 
   /// Call this method in the loop
   void process(int delay_no_data = 100) {
-    if (p_in->available() > 0) {
-      if (p_in->readBytes((uint8_t *)&cmd, sizeof(Cmd)) > 0) {
-        switch (cmd.id) {
-          case MODE:
-            pinMode(cmd.p1, cmd.p1);
-            break;
-          case WRITE:
-            digitalWrite(cmd.p1, cmd.p1);
-            break;
-          case DELAY:
-            delayMicroseconds(cmd.p1);
-            break;
-          case PULSE:
-            defaultDriver.pulseEnable(cmd.p1);
-            break;
-          case BRIGHTNESS:
-            defaultDriver.setBrightness(cmd.p1, cmd.p2);
-            break;
-          default:
-            Serial.print("Error - undefined id");
-            break;
-        }
-      }
-    } else {
+    // resynchronize: skip everything up to the next sync byte
+    while (p_in->available() > 0 && p_in->peek() != Cmd::SYNC) {
+      p_in->read();
+    }
+
+    if (p_in->available() == 0) {
       delay(delay_no_data);
+      return;
+    }
+
+    // wait until the full command has arrived
+    if (p_in->available() < (int)sizeof(Cmd)) return;
+
+    if (p_in->readBytes((uint8_t *)&cmd, sizeof(Cmd)) != sizeof(Cmd)) return;
+
+    switch (cmd.id) {
+      case CmdEnum::MODE:
+        driver.pinModeLCD(cmd.p1, cmd.p2);
+        break;
+      case CmdEnum::WRITE:
+        driver.digitalWriteLCD(cmd.p1, cmd.p2);
+        break;
+      case CmdEnum::DELAY:
+        driver.delayMicrosecondsLCD(cmd.p1);
+        break;
+      case CmdEnum::PULSE:
+        driver.pulseEnable(cmd.p1);
+        break;
+      case CmdEnum::BRIGHTNESS:
+        driver.setBrightness(cmd.p1, cmd.p2);
+        break;
+      default:
+        break;  // unknown command: ignore
     }
   }
 
  protected:
   Stream *p_in = nullptr;
-  static const int len = 80;
   Cmd cmd;
-  LCDDriver defaultDriver;
+  LCDDriver driver;
 };
 
 /**
@@ -252,13 +276,9 @@ class CommonLCD : public Print {
     command(LCD_ENTRYMODESET | _displaymode);
   }
 
-  void createChar(uint8_t location, const uint8_t charmap[]) {
-    createChar(location, (uint8_t *)charmap);
-  }
-
   // Allows us to fill the first 8 CGRAM locations
   // with custom characters
-  void createChar(uint8_t location, uint8_t charmap[]) {
+  void createChar(uint8_t location, const uint8_t charmap[]) {
     location &= 0x7;  // we only have 8 locations 0-7
     command(LCD_SETCGRAMADDR | (location << 3));
     for (int i = 0; i < 8; i++) {
@@ -278,42 +298,44 @@ class CommonLCD : public Print {
 
   using Print::write;
 
-  /// Defines the brightness (0-100)
+  /// Defines the brightness (0-100) of the (PWM) backlight pin, if one was
+  /// defined
   virtual void setBrightness(uint16_t percent) {
-    int val = map(percent, 0, 100, 20, 225);
-    analogWrite(_led_a, val);
+    if (_led_a == 0) return;
+    if (percent > 100) percent = 100;
+    analogWrite(_led_a, (int)map(percent, 0, 100, 0, 255));
   }
 
  protected:
   // commands
-  const uint8_t LCD_CLEARDISPLAY = 0x01;
-  const uint8_t LCD_RETURNHOME = 0x02;
-  const uint8_t LCD_ENTRYMODESET = 0x04;
-  const uint8_t LCD_DISPLAYCONTROL = 0x08;
-  const uint8_t LCD_CURSORSHIFT = 0x10;
-  const uint8_t LCD_FUNCTIONSET = 0x20;
-  const uint8_t LCD_SETCGRAMADDR = 0x40;
-  const uint8_t LCD_SETDDRAMADDR = 0x80;
+  static const uint8_t LCD_CLEARDISPLAY = 0x01;
+  static const uint8_t LCD_RETURNHOME = 0x02;
+  static const uint8_t LCD_ENTRYMODESET = 0x04;
+  static const uint8_t LCD_DISPLAYCONTROL = 0x08;
+  static const uint8_t LCD_CURSORSHIFT = 0x10;
+  static const uint8_t LCD_FUNCTIONSET = 0x20;
+  static const uint8_t LCD_SETCGRAMADDR = 0x40;
+  static const uint8_t LCD_SETDDRAMADDR = 0x80;
 
   // flags for display entry mode
-  const uint8_t LCD_ENTRYRIGHT = 0x00;
-  const uint8_t LCD_ENTRYLEFT = 0x02;
-  const uint8_t LCD_ENTRYSHIFTINCREMENT = 0x01;
-  const uint8_t LCD_ENTRYSHIFTDECREMENT = 0x00;
+  static const uint8_t LCD_ENTRYRIGHT = 0x00;
+  static const uint8_t LCD_ENTRYLEFT = 0x02;
+  static const uint8_t LCD_ENTRYSHIFTINCREMENT = 0x01;
+  static const uint8_t LCD_ENTRYSHIFTDECREMENT = 0x00;
 
   // flags for display on/off control
-  const uint8_t LCD_DISPLAYON = 0x04;
-  const uint8_t LCD_DISPLAYOFF = 0x00;
-  const uint8_t LCD_CURSORON = 0x02;
-  const uint8_t LCD_CURSOROFF = 0x00;
-  const uint8_t LCD_BLINKON = 0x01;
-  const uint8_t LCD_BLINKOFF = 0x00;
+  static const uint8_t LCD_DISPLAYON = 0x04;
+  static const uint8_t LCD_DISPLAYOFF = 0x00;
+  static const uint8_t LCD_CURSORON = 0x02;
+  static const uint8_t LCD_CURSOROFF = 0x00;
+  static const uint8_t LCD_BLINKON = 0x01;
+  static const uint8_t LCD_BLINKOFF = 0x00;
 
   // flags for display/cursor shift
-  const uint8_t LCD_DISPLAYMOVE = 0x08;
-  const uint8_t LCD_CURSORMOVE = 0x00;
-  const uint8_t LCD_MOVERIGHT = 0x04;
-  const uint8_t LCD_MOVELEFT = 0x00;
+  static const uint8_t LCD_DISPLAYMOVE = 0x08;
+  static const uint8_t LCD_CURSORMOVE = 0x00;
+  static const uint8_t LCD_MOVERIGHT = 0x04;
+  static const uint8_t LCD_MOVELEFT = 0x00;
 
   // flags for function set
   static const uint8_t LCD_8BITMODE = 0x10;
@@ -324,14 +346,14 @@ class CommonLCD : public Print {
   static const uint8_t LCD_5x8DOTS = 0x00;
 
   // variables
-  uint8_t _row_offsets[4];
-  uint8_t _displaymode;
-  uint8_t _displaycontrol;
-  uint8_t _numlines;
-  uint8_t _led_a;  // LED brightness
+  uint8_t _row_offsets[4] = {0x00, 0x40, 0x14, 0x54};
+  uint8_t _displaymode = 0;
+  uint8_t _displaycontrol = 0;
+  uint8_t _numlines = 1;
+  uint8_t _led_a = 0;  // LED brightness pin (0: not used)
 
   inline void command(uint8_t value) { send(value, LOW); }
-  virtual void delayMicrosecondsLCD(uint16_t ms)  { delayMicroseconds(ms); }
+  virtual void delayMicrosecondsLCD(uint16_t us) { delayMicroseconds(us); }
   virtual void send(uint8_t value, uint8_t mode) = 0;
 };
 
@@ -362,28 +384,32 @@ class LCD : public CommonLCD {
 
   LCD(uint8_t rs, uint8_t rw, uint8_t enable, uint8_t d0, uint8_t d1,
       uint8_t d2, uint8_t d3, uint8_t d4, uint8_t d5, uint8_t d6, uint8_t d7,
-      uint8_t leda = 0, AbstractLCDDriver &driver = defaultDriver) {
+      uint8_t leda = 0, AbstractLCDDriver &driver = defaultLCDDriver()) {
     init(0, rs, rw, enable, d0, d1, d2, d3, d4, d5, d6, d7, leda, driver);
   }
 
   LCD(uint8_t rs, uint8_t enable, uint8_t d0, uint8_t d1, uint8_t d2,
       uint8_t d3, uint8_t d4, uint8_t d5, uint8_t d6, uint8_t d7,
-      uint8_t leda = 0, AbstractLCDDriver &driver = defaultDriver) {
+      uint8_t leda = 0, AbstractLCDDriver &driver = defaultLCDDriver()) {
     init(0, rs, 255, enable, d0, d1, d2, d3, d4, d5, d6, d7, leda, driver);
   }
 
   LCD(uint8_t rs, uint8_t rw, uint8_t enable, uint8_t d0, uint8_t d1,
       uint8_t d2, uint8_t d3, uint8_t leda = 0,
-      AbstractLCDDriver &driver = defaultDriver) {
+      AbstractLCDDriver &driver = defaultLCDDriver()) {
     init(1, rs, rw, enable, d0, d1, d2, d3, 0, 0, 0, 0, leda, driver);
   }
 
   LCD(uint8_t rs, uint8_t enable, uint8_t d0, uint8_t d1, uint8_t d2,
-      uint8_t d3, uint8_t leda = 0, AbstractLCDDriver &driver = defaultDriver) {
+      uint8_t d3, uint8_t leda = 0, AbstractLCDDriver &driver = defaultLCDDriver()) {
     init(1, rs, 255, enable, d0, d1, d2, d3, 0, 0, 0, 0, leda, driver);
   }
 
-  void begin(uint8_t cols, uint8_t lines, uint8_t dotsize = LCD_5x8DOTS) {
+  /// Initializes the display. This must be called before using the display
+  /// (typically in setup()).
+  void begin(uint8_t cols, uint8_t lines,
+             uint8_t dotsize = LCD_5x8DOTS) override {
+    _displayfunction &= ~(LCD_2LINE | LCD_5x10DOTS);
     if (lines > 1) {
       _displayfunction |= LCD_2LINE;
     }
@@ -484,18 +510,11 @@ class LCD : public CommonLCD {
     }
   }
 
-  // /// Obsolete
-  // void printstr(const char c[]) {
-  //   // This function is not identical to the function used for "real" I2C
-  //   // displays it's here so the user sketch doesn't have to be changed
-  //   print(c);
-  // }
-
  protected:
   void init(uint8_t fourbitmode, uint8_t rs, uint8_t rw, uint8_t enable,
             uint8_t d0, uint8_t d1, uint8_t d2, uint8_t d3, uint8_t d4,
             uint8_t d5, uint8_t d6, uint8_t d7, uint8_t led_a,
-            AbstractLCDDriver &driver = defaultDriver) {
+            AbstractLCDDriver &driver = defaultLCDDriver()) {
     p_driver = &driver;
     _rs_pin = rs;
     _rw_pin = rw;
@@ -516,11 +535,11 @@ class LCD : public CommonLCD {
       _displayfunction = LCD_4BITMODE | LCD_1LINE | LCD_5x8DOTS;
     else
       _displayfunction = LCD_8BITMODE | LCD_1LINE | LCD_5x8DOTS;
-
-    begin(16, 1);
+    // Note: begin() is not called here, so that the constructor never touches
+    // the pins (or the serial line) before setup() runs.
   }
   // write either command or data, with automatic 4/8-bit selection
-  void send(uint8_t value, uint8_t mode) {
+  void send(uint8_t value, uint8_t mode) override {
     digitalWriteLCD(_rs_pin, mode);
 
     // if there is a RW pin indicated, set it low to Write
@@ -561,7 +580,9 @@ class LCD : public CommonLCD {
     p_driver->digitalWriteLCD(pin, value);
   }
 
-  void delayMicrosecondsLCD(uint16_t ms) override { p_driver->delayMicrosecondsLCD(ms); }
+  void delayMicrosecondsLCD(uint16_t us) override {
+    p_driver->delayMicrosecondsLCD(us);
+  }
 
   // variables
   uint8_t _rs_pin;      // LOW: command.  HIGH: character.
@@ -569,14 +590,13 @@ class LCD : public CommonLCD {
   uint8_t _enable_pin;  // activated by a HIGH pulse.
   uint8_t _data_pins[8];
 
-  uint8_t _displayfunction;
-  uint8_t _initialized;
+  uint8_t _displayfunction = 0;
 
   AbstractLCDDriver *p_driver = nullptr;
 };
 
 /**
- * @brief Control LCD Display using I2C module. The Wire object nees to be set up
+ * @brief Control LCD Display using I2C module. The Wire object needs to be set up
  * separately.
  */
 class LCD_I2C : public CommonLCD {
@@ -588,22 +608,22 @@ class LCD_I2C : public CommonLCD {
     _p_wire = &Wire;
   }
 
-  void setWire(TwoWire &wire){
-    _p_wire = &wire;
+  void setWire(TwoWire &wire) { _p_wire = &wire; }
+
+  void begin(uint8_t lcd_cols, uint8_t lcd_rows, uint8_t charsize,
+             TwoWire &wire) {
+    setWire(wire);
+    begin(lcd_cols, lcd_rows, charsize);
   }
 
   void begin(uint8_t lcd_cols, uint8_t lcd_rows,
-             uint8_t charsize, TwoWire &wire) {
-      setWire(wire);
-      begin(lcd_cols, lcd_rows, charsize);
-  }
-
-  void begin(uint8_t lcd_cols, uint8_t lcd_rows,
-             uint8_t charsize = LCD_5x8DOTS) {
+             uint8_t charsize = LCD_5x8DOTS) override {
     _cols = lcd_cols;
     _rows = lcd_rows;
     _charsize = charsize;
-    if(_p_wire==nullptr){
+    _numlines = lcd_rows;
+    setRowOffsets(0x00, 0x40, 0x00 + lcd_cols, 0x40 + lcd_cols);
+    if (_p_wire == nullptr) {
       _p_wire = &Wire;
     }
 
@@ -625,8 +645,8 @@ class LCD_I2C : public CommonLCD {
     delay(50);
 
     // Now we pull both RS and R/W low to begin commands
-    expanderWrite(_backlightval);  // reset expanderand turn backlight off (Bit 8 =1)
-    delay(1000);
+    expanderWrite(_backlightval);  // reset expander (backlight bit as set)
+    delay(50);
 
     // put the LCD into 4 bit mode
     //  this is according to the hitachi HD44780 datasheet
@@ -678,24 +698,30 @@ class LCD_I2C : public CommonLCD {
   }
   bool getBacklight() { return _backlightval == LCD_BACKLIGHT; }
 
+  void setBacklight(bool new_val) {
+    if (new_val) {
+      backlight();  // turn backlight on
+    } else {
+      noBacklight();  // turn backlight off
+    }
+  }
+
  protected:
   uint8_t _addr;
-  uint8_t _displaycontrol;
-  uint8_t _displayfunction;
-  uint8_t _displaymode;
-  uint8_t _cols;
-  uint8_t _rows;
-  uint8_t _charsize;
+  uint8_t _displayfunction = 0;
+  uint8_t _cols = 0;
+  uint8_t _rows = 0;
+  uint8_t _charsize = 0;
   uint8_t _backlightval;
-  TwoWire *_p_wire=nullptr;
+  TwoWire *_p_wire = nullptr;
 
-  const uint8_t LCD_BACKLIGHT = 0x08;
-  const uint8_t LCD_NOBACKLIGHT = 0x00;
-  const uint8_t En = B00000100;  // Enable bit
-  const uint8_t Rw = B00000010;  // Read/Write bit
-  const uint8_t Rs = B00000001;  // Register select bit
+  static const uint8_t LCD_BACKLIGHT = 0x08;
+  static const uint8_t LCD_NOBACKLIGHT = 0x00;
+  static const uint8_t En = 0x04;  // Enable bit
+  static const uint8_t Rw = 0x02;  // Read/Write bit
+  static const uint8_t Rs = 0x01;  // Register select bit
 
-  void send(uint8_t value, uint8_t mode) {
+  void send(uint8_t value, uint8_t mode) override {
     uint8_t highnib = value & 0xf0;
     uint8_t lownib = (value << 4) & 0xf0;
     write4bits((highnib) | mode);
@@ -715,168 +741,130 @@ class LCD_I2C : public CommonLCD {
 
   void pulseEnable(uint8_t _data) {
     expanderWrite(_data | En);  // En high
-    delayMicrosecondsLCD(1);       // enable pulse must be >450ns
+    delayMicrosecondsLCD(1);    // enable pulse must be >450ns
 
     expanderWrite(_data & ~En);  // En low
-    delayMicrosecondsLCD(50);       // commands need > 37us to settle
+    delayMicrosecondsLCD(50);    // commands need > 37us to settle
   }
 
   void load_custom_character(uint8_t char_num, uint8_t *rows) {
     createChar(char_num, rows);
   }
 
-  void setBacklight(bool new_val) {
-    if (new_val) {
-      backlight();  // turn backlight on
-    } else {
-      noBacklight();  // turn backlight off
-    }
-  }
-  
-  void delayMicrosecondsLCD(uint16_t ms) override { delayMicroseconds(ms); }
-
+  void delayMicrosecondsLCD(uint16_t us) override { delayMicroseconds(us); }
 };
 
 /**
- * @brief LCDBarGraph is class for displaying analog values in LCD display,
- * which is previously initialized. This library uses LiquedCrystal library
- * for displaying.
- * @author Balazs Kelemen
- * @copyright 2010 Balazs Kelemen
- * contact: prampec+arduino@gmail.com
- * credits: Hans van Neck
- * copying: permission statement:
-    This file is part of LCDBarGraph.
-    LCDBarGraph is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
+ * @brief Horizontal bar graph for an LCD. The bar is drawn into one row,
+ * starting at column startX and spanning numCols characters. Each character
+ * shows 5 steps, so the bar has a resolution of numCols * 5 steps.
+ *
+ * The bar uses the custom characters 0-4 of the display (0: completely
+ * filled, 1-4: 1 to 4 filled pixel columns). Any custom characters you defined
+ * in these slots are overwritten. Create the bar after lcd.begin(). If the
+ * display has a built-in solid block character, you can select it with
+ * setFilledChar().
+ */
 class LCDBarGraph {
  public:
   /**
-   * Create an instance of the class. The bar will be drawn in the startY row
-   * of the LCD, from the startX column positon (inclusive) to to the
-   * startX+numCols column position (inclusive). lcd - A LiquidCristal instance
-   * should be passed. numCols - Width of the bar. startX - Horzontal starting
-   * position (column) of the bar. Zero based value. startY - Vertical starting
-   * position (row) of the bar. Zero based value.
+   * @param lcd the (already started) display
+   * @param numCols width of the bar in characters
+   * @param startX column of the first bar character (0 based)
+   * @param startY row of the bar (0 based)
    */
   LCDBarGraph(CommonLCD &lcd, byte numCols, byte startX = 0, byte startY = 0) {
-    // -- setting fields
-    _lcd = &lcd;
-    _numCols = numCols;
-    _startX = startX;
-    _startY = startY;
-    // -- creating characters
-#ifndef USE_BUILDIN_FILLED_CHAR
-    _lcd->createChar(0, this->_level0);
-#endif
-    _lcd->createChar(1, this->_level1);
-    _lcd->createChar(2, this->_level2);
-    _lcd->createChar(3, this->_level3);
-    _lcd->createChar(4, this->_level4);
-    _lcd->clear();  // put lcd back into DDRAM mode
-    // -- setting initial values
-    this->_prevValue = 0;      // -- cached value
-    this->_lastFullChars = 0;  // -- cached value
+    p_lcd = &lcd;
+    cols = numCols;
+    x = startX;
+    y = startY;
+    for (byte slot = 0; slot <= 4; slot++) {
+      defineGlyph(slot);
+    }
+    p_lcd->clear();  // leave CGRAM mode and start with an empty display
   }
 
   /**
-   * Draw a bargraph with a value between 0 and maxValue.
+   * Defines the character code that is used for completely filled positions.
+   * Use this if the display has a built-in solid block character. The default
+   * is -1: the solid block is defined as custom character 0.
+   */
+  void setFilledChar(int code) {
+    filledChar = code;
+    drawnSteps = -1;  // force a redraw with the new character
+  }
+
+  /// Provides the character code for filled positions (-1: custom char 0)
+  int getFilledChar() const { return filledChar; }
+
+  /**
+   * Draws the bar for a value between 0 and maxValue. Out of range values are
+   * limited to this range. Nothing is written if the bar does not change.
    */
   void drawValue(int value, int maxValue) {
-    // -- calculate full (filled) character count
-    byte fullChars = (long)value * _numCols / maxValue;
-    // -- calculate partial character bar count
-    byte mod = ((long)value * _numCols * 5 / maxValue) % 5;
+    if (maxValue <= 0) return;
+    if (value < 0) value = 0;
+    if (value > maxValue) value = maxValue;
 
-    // -- if value does not change, do not draw anything
-    int normalizedValue = (int)fullChars * 5 + mod;
-    if (this->_prevValue != normalizedValue) {
-      // -- do not clear the display to eliminate flickers
-      _lcd->setCursor(_startX, _startY);
+    // bar length in steps of 1/5 character
+    long steps = (long)value * cols * 5 / maxValue;
+    if (steps == drawnSteps) return;
 
-      // -- write filled characters
-      for (byte i = 0; i < fullChars; i++) {
-#ifdef USE_BUILDIN_FILLED_CHAR
-        _lcd->write(
-            (byte)USE_BUILDIN_FILLED_CHAR);  // -- use build in filled char
-#else
-        _lcd->write((byte)0);
-#endif
-      }
+    byte whole = steps / 5;
+    byte rest = steps % 5;
+    byte used = whole + (rest > 0 ? 1 : 0);
 
-      // -- write the partial character
-      if (mod > 0) {
-        _lcd->write(mod);  // -- index the right partial character
-        ++fullChars;
-      }
+    p_lcd->setCursor(x, y);
+    byte solid = filledChar >= 0 ? (byte)filledChar : 0;
+    for (byte i = 0; i < whole; i++) p_lcd->write(solid);
+    if (rest > 0) p_lcd->write(rest);
+    // erase what the previous (longer) bar left behind
+    for (byte i = used; i < drawnChars; i++) p_lcd->write(' ');
 
-      // -- clear characters left over the previous draw
-      for (byte i = fullChars; i < this->_lastFullChars; i++) {
-        _lcd->write(' ');
-      }
-
-      // -- save cache
-      this->_lastFullChars = fullChars;
-      this->_prevValue = normalizedValue;
-    }
+    drawnSteps = steps;
+    drawnChars = used;
   }
 
  private:
-  CommonLCD *_lcd;
-  byte _numCols;
-  byte _startX;
-  byte _startY;
-  int _prevValue;
-  byte _lastFullChars;
+  CommonLCD *p_lcd;
+  byte cols;
+  byte x;
+  byte y;
+  long drawnSteps = 0;
+  byte drawnChars = 0;
+  int filledChar = -1;
 
-// -- initializing bar segment characters
-#ifndef USE_BUILDIN_FILLED_CHAR
-  // -- filled character
-  const uint8_t _level0[8] = {B11111, B11111, B11111, B11111,
-                              B11111, B11111, B11111, B11111};
-#endif
-
-  // -- character with one bar
-  const uint8_t _level1[8] = {B10000, B10000, B10000, B10000,
-                              B10000, B10000, B10000, B10000};
-  // -- character with two bars
-  const uint8_t _level2[8] = {B11000, B11000, B11000, B11000,
-                              B11000, B11000, B11000, B11000};
-  // -- character with three bars
-  const uint8_t _level3[8] = {B11100, B11100, B11100, B11100,
-                              B11100, B11100, B11100, B11100};
-  // -- character with four bars
-  const uint8_t _level4[8] = {B11110, B11110, B11110, B11110,
-                              B11110, B11110, B11110, B11110};
+  /// Stores a glyph in the given custom character slot: slot 1-4 fill that
+  /// many pixel columns from the left, slot 0 is the solid block (5 columns).
+  void defineGlyph(byte slot) {
+    byte width = (slot == 0) ? 5 : slot;
+    byte row = (0x1F << (5 - width)) & 0x1F;
+    uint8_t glyph[8];
+    for (byte i = 0; i < 8; i++) glyph[i] = row;
+    p_lcd->createChar(slot, glyph);
+  }
 };
 
 // forward declarations
 class LCDMenuScreen;
 class LCDMenu;
 
+/// Callback which is called when a screen or a text is selected
+typedef void (*LCDMenuCallback)(uint16_t screen_pos, int text_pos,
+                                const char *txt);
+
 /**
- * @brief Defines a text at the indicated position
- *
+ * @brief Defines a text at the indicated position. Only selectable texts can
+ * be reached with nextText()/priorText().
  */
 class LCDMenuText {
  public:
   LCDMenuText(uint16_t x, uint16_t y, const char *txt, bool selectable = false,
-              void (*selectText)(uint16_t screen_pos, uint16_t text_pos,
-                                 const char *txt) = nullptr) {
+              LCDMenuCallback selectText = nullptr) {
     this->x = x;
     this->y = y;
     this->txt = txt;
-    this->selectable = select;
+    this->selectable = selectable;
     this->p_select_text = selectText;
   }
 
@@ -886,147 +874,140 @@ class LCDMenuText {
   uint16_t y;
   const char *txt = nullptr;
   bool selectable;
-  void (*p_select_text)(uint16_t screen_pos, uint16_t text_pos,
-                        const char *txt) = nullptr;
+  LCDMenuCallback p_select_text = nullptr;
 };
 
 /**
- * @brief Defines texts for one screen
- *
+ * @brief Defines texts for one screen. The array of texts must stay valid for
+ * the lifetime of the screen.
  */
 class LCDMenuScreen {
  public:
   template <int N>
   LCDMenuScreen(const LCDMenuText *(&texts)[N],
-                void (*selectScreen)(uint16_t screen_pos, uint16_t text_pos,
-                                     const char *txt) = nullptr,
-                void (*selectText)(uint16_t screen_pos, uint16_t text_pos,
-                                   const char *txt) = nullptr) {
+                LCDMenuCallback selectScreen = nullptr,
+                LCDMenuCallback selectText = nullptr) {
     this->txt = texts;
     this->len = N;
     this->p_select_screen = selectScreen;
     this->p_select_text = selectText;
-
-    for (int j = 0; j < len; j++) {
-      if (txt[j].selectable) {
-        lenSelectable++;
-      }
-    }
-    selectable = new LCDMenuText *[lenSelectable];
-    int sel_pos = 0;
-    for (int j = 0; j < len; j++) {
-      if (txt[j].selectable) {
-        selectable[sel_pos++] = txt + j;
-      }
-    }
   }
 
-  ~LCDMenuScreen() {
-    if (selectable != nullptr) {
-      delete[] selectable;
-    }
-  }
-
+  /// Shows all texts and puts the cursor on the first selectable one
   void display() {
+    if (p_lcd == nullptr) return;
     clear();
-
     for (int j = 0; j < len; j++) {
-      LCDMenuText actual = txt[j];
-      p_lcd->setCursor(actual.x, actual.y);
-      p_lcd->print(actual.txt);
+      p_lcd->setCursor(txt[j]->x, txt[j]->y);
+      p_lcd->print(txt[j]->txt);
     }
+    setText(0);
   }
 
+  /// calls the callback of the screen
   void selectScreen(uint16_t pos) {
     if (p_select_screen != nullptr) {
-      const char *str = nullptr;
-      if (text_pos >= 0) {
-        str = selectable[text_pos]->txt;
-      }
-      p_select_screen(pos, text_pos, str);
+      p_select_screen(pos, text_pos, selectedText());
     }
   }
 
-  int nextText() { return setText(++text_pos); }
+  /// moves to the next selectable text (wraps around)
+  int nextText() { return setText(text_pos + 1); }
 
-  int priorText() { return setText(--text_pos); }
+  /// moves to the prior selectable text (wraps around)
+  int priorText() { return setText(text_pos - 1); }
 
+  /// selects the n-th selectable text; returns -1 if there is none
   int setText(int pos) {
-    if (pos > lenSelectable) {
-      pos = 0;
-    }
-    if (pos < 0) {
-      pos = lenSelectable - 1;
-    }
-    if (pos >= 0) {
-      text_pos = pos;
-      p_lcd->setCursor(selectable[text_pos]->x, selectable[text_pos]->y);
-      p_lcd->cursor();
-      p_lcd->blink();
-    } else {
+    int count = selectableCount();
+    if (count == 0 || p_lcd == nullptr) {
       text_pos = -1;
-      p_lcd->noCursor();
-      p_lcd->noBlink();
+      if (p_lcd != nullptr) {
+        p_lcd->noCursor();
+        p_lcd->noBlink();
+      }
+      return text_pos;
     }
+    if (pos >= count) pos = 0;
+    if (pos < 0) pos = count - 1;
+    text_pos = pos;
+    const LCDMenuText *t = selectableAt(text_pos);
+    p_lcd->setCursor(t->x, t->y);
+    p_lcd->cursor();
+    p_lcd->blink();
     return text_pos;
   }
 
-  void clear() { p_lcd->clear(); }
+  void clear() {
+    if (p_lcd != nullptr) p_lcd->clear();
+  }
 
  protected:
   friend class LCDMenu;
-  CommonLCD *p_lcd;
-  int len;
-  LCDMenuText *txt;
-  void (*p_select_screen)(uint16_t screen_pos, uint16_t text_pos,
-                          const char *txt) = nullptr;
-  void (*p_select_text)(uint16_t screen_pos, uint16_t text_pos,
-                        const char *txt) = nullptr;
-  int lenSelectable = 0;
-  LCDMenuText **selectable;
-  int text_pos = 0;
+  CommonLCD *p_lcd = nullptr;
+  int len = 0;
+  const LCDMenuText *const *txt = nullptr;
+  LCDMenuCallback p_select_screen = nullptr;
+  LCDMenuCallback p_select_text = nullptr;
+  int text_pos = -1;  // index in the selectable texts; -1: none
 
   void setLCD(CommonLCD *lcd) { p_lcd = lcd; }
 
-  /// calls the callback on the actually selected text
-  void selectText(int screen) {
-    // callback defined on text element
-    const char *str = nullptr;
-    if (text_pos >= 0) {
-      str = selectable[text_pos]->txt;
+  int selectableCount() const {
+    int count = 0;
+    for (int j = 0; j < len; j++) {
+      if (txt[j]->selectable) count++;
     }
+    return count;
+  }
 
-    if (selectable[text_pos]->p_select_text) {
-      selectable[text_pos]->p_select_text(text_pos, text_pos, str);
+  const LCDMenuText *selectableAt(int n) const {
+    for (int j = 0; j < len; j++) {
+      if (txt[j]->selectable && n-- == 0) return txt[j];
     }
-    // callback defined here
+    return nullptr;
+  }
+
+  const char *selectedText() const {
+    const LCDMenuText *t = text_pos >= 0 ? selectableAt(text_pos) : nullptr;
+    return t != nullptr ? t->txt : nullptr;
+  }
+
+  /// calls the callbacks on the actually selected text
+  void selectText(uint16_t screen) {
+    if (text_pos < 0) return;
+    const LCDMenuText *t = selectableAt(text_pos);
+    if (t == nullptr) return;
+    // callback defined on the text element
+    if (t->p_select_text != nullptr) {
+      t->p_select_text(screen, text_pos, t->txt);
+    }
+    // callback defined on the screen
     if (p_select_text != nullptr) {
-      p_select_text(text_pos, text_pos, str);
+      p_select_text(screen, text_pos, t->txt);
     }
   }
 };
 
 /**
- * @brief Defines a Menu as a array of Screens
- *
+ * @brief Defines a Menu as an array of Screens. The array must stay valid for
+ * the lifetime of the menu.
  */
 class LCDMenu {
  public:
   template <int N>
-  LCDMenu(CommonLCD &lcd, const LCDMenuScreen *(&screens)[N]) {
+  LCDMenu(CommonLCD &lcd, LCDMenuScreen *(&screens)[N]) {
     this->p_lcd = &lcd;
     this->screens = screens;
     this->len = N;
-    current_screen = screens;  // point to first screen
     current = 0;
-
     // setup lcd for screens
     for (int j = 0; j < len; j++) {
-      screens[j].setLCD(&lcd);
+      screens[j]->setLCD(&lcd);
     }
   }
 
-  /// Activates the menu
+  /// Activates the menu and shows the indicated screen
   void begin(int pos = 0) {
     active = true;
     setScreen(pos);
@@ -1038,49 +1019,46 @@ class LCDMenu {
   /// Clears the screen
   void clear() { p_lcd->clear(); }
 
-  /// Moves to the next screen
-  int nextScreen() { return setScreen(++current); }
+  /// Moves to the next screen (wraps around)
+  int nextScreen() { return setScreen(current + 1); }
 
-  /// Moves to the prior screed
-  int priorScreen() { return setScreen(++current); }
+  /// Moves to the prior screen (wraps around)
+  int priorScreen() { return setScreen(current - 1); }
 
   /// Moves to the indicated screen index
   int setScreen(int pos) {
-    if (active) {
+    if (active && len > 0) {
+      if (pos >= len) pos = 0;
+      if (pos < 0) pos = len - 1;
       current = pos;
-      if (current >= len) {
-        current = 0;
-      }
-      if (current <= 0) {
-        current = len - 1;
-      }
-      current_screen = &screens[current];
-      current_screen->display();
+      screens[current]->display();
     }
     return current;
   }
 
   /// Executes the callback of the currently selected screen
   void selectScreen() {
-    current_screen->selectScreen(current);
-    current_screen->selectText(0);
+    if (active && len > 0) screens[current]->selectScreen(current);
   }
 
   /// Executes the callback of the currently selected text
-  void selectText() { current_screen->selectText(current); }
+  void selectText() {
+    if (active && len > 0) screens[current]->selectText(current);
+  }
 
   /// moves to the next selectable text
-  int nextText() { return current_screen->nextText(); }
+  int nextText() { return active && len > 0 ? screens[current]->nextText() : -1; }
   /// moves to the prior selectable text
-  int priorText() { return current_screen->priorText(); }
+  int priorText() { return active && len > 0 ? screens[current]->priorText() : -1; }
   /// Selects the text at the indicated index
-  int setText(int pos) { return current_screen->setText(pos); }
+  int setText(int pos) {
+    return active && len > 0 ? screens[current]->setText(pos) : -1;
+  }
 
  protected:
-  int len;
+  int len = 0;
   CommonLCD *p_lcd = nullptr;
-  LCDMenuScreen *screens = nullptr;
-  LCDMenuScreen *current_screen = nullptr;
+  LCDMenuScreen **screens = nullptr;
   int current = 0;
   bool active = false;
 };

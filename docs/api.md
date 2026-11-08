@@ -11,10 +11,10 @@ Creates a variable of type LCD. The display can be controlled using 4 or 8 data 
 #### Syntax
 
 ```
-LCD(rs, enable, d4, d5, d6, d7, [led_a, driver])
-LCD(rs, rw, enable, d4, d5, d6, d7, [led_a, driver])
-LCD(rs, enable, d0, d1, d2, d3, d4, d5, d6, d7, [led_a, driver])
-LCD(rs, rw, enable, d0, d1, d2, d3, d4, d5, d6, d7, [led_a, driver])
+LCD(rs, enable, d4, d5, d6, d7, [driver])
+LCD(rs, rw, enable, d4, d5, d6, d7, [driver])
+LCD(rs, enable, d0, d1, d2, d3, d4, d5, d6, d7, [driver])
+LCD(rs, rw, enable, d0, d1, d2, d3, d4, d5, d6, d7, [driver])
 ```
 
 #### Parameters
@@ -26,9 +26,9 @@ enable: the number of the Arduino pin that is connected to the enable pin on the
 
 d0, d1, d2, d3, d4, d5, d6, d7: the numbers of the Arduino pins that are connected to the corresponding data pins on the LCD. d0, d1, d2, and d3 are optional; if omitted, the LCD will be controlled using only the four data lines (d4, d5, d6, d7).
 
-led_a: optionl - pwm pin which controls the brigness
+To control the brightness of the backlight, call `setBrightnessPin(pin)` with a PWM pin before `begin()` and use `setBrightness(0..100)`.
 
-driver: optional - driver which defines how the commands are sent out
+driver: optional - driver which defines how the commands are sent out (e.g. an `LCDWriteDriver` for the client/server mode)
 
 #### Example
 

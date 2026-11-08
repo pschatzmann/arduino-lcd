@@ -48,7 +48,7 @@
 // with the Arduino pin number it is connected to
 const int rs = 12, en = 11, d4 = 5, d5 = 4, d6 = 3, d7 = 2;
 LCDWriteDriver driver(Serial);
-LCD lcd(rs, en, d4, d5, d6, d7, 0, driver);
+LCD lcd(rs, en, d4, d5, d6, d7, driver);
 
 void setup() {
   // Setup Serial 

@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-
+      
 env:
   DOXYGEN_VERSION: 1.9.8
 

@@ -24,7 +24,9 @@ struct Parallel4 {
   Parallel4(int cols = 16, int rows = 2, int led = 0)
       : hd(cols, rows),
         bus(hd, 12, 11, {5, 4, 3, 2}),
-        lcd(12, 11, 5, 4, 3, 2, led) {}
+        lcd(12, 11, 5, 4, 3, 2) {
+    if (led != 0) lcd.setBrightnessPin(led);
+  }
 };
 
 /// 8 bit parallel display with RW: rs=12, rw=10, en=11, d0..d7 = 2..9

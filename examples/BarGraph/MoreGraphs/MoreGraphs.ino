@@ -20,7 +20,7 @@ byte i5 = 0;
 
 void setup(){
   // -- initializing the LCD
-  lcd.begin(2, lcdNumCols);
+  lcd.begin(lcdNumCols, 2);
   lcd.clear();
   // -- do some delay: some time I've got broken visualization
   delay(100);

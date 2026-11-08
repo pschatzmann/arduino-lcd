@@ -41,6 +41,8 @@ Using an I2C LCD Module
 LCD_I2C lcd(0x27);
 
 void setup() {
+  // the I2C bus must be started by the sketch
+  Wire.begin();
   // set up the LCD's number of columns and rows:
   lcd.begin(16, 2);
 }

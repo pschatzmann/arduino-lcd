@@ -1,5 +1,7 @@
 # LCD
 
+The functions of the `LCD` class. `LCD_I2C` provides the same functions (see [I2C](i2c.md)). The pins are only used after `begin()` was called.
+
 ## Functions
 
 ### `LCD()`
@@ -383,7 +385,7 @@ lcd: a variable of type LCD
 
 #### Description
 
-Create a custom character (glyph) for use on the LCD. Up to eight characters of 5x8 pixels are supported (numbered 0 to 7). The appearance of each custom character is specified by an array of eight bytes, one for each row. The five least significant bits of each byte determine the pixels in that row. To display a custom character on the screen, write() its number.
+Create a custom character (glyph) for use on the LCD. Call it after `begin()` and call `setCursor()` or `clear()` before you write text again. Up to eight characters of 5x8 pixels are supported (numbered 0 to 7). The appearance of each custom character is specified by an array of eight bytes, one for each row. The five least significant bits of each byte determine the pixels in that row. To display a custom character on the screen, write() its number.
 
 >NB : When referencing custom character "0", if it is not in a variable, you need to cast it as a byte, otherwise the compiler throws an error.
 
@@ -419,9 +421,58 @@ byte smiley[8] = {
 };
 
 void setup() {
+  lcd.begin(16, 2);
   lcd.createChar(0, smiley);
-  lcd.begin(16, 2);  
+  lcd.setCursor(0, 0);  // leave the character generator memory
   lcd.write(byte(0));
+}
+
+void loop() {}
+```
+
+### `setBrightnessPin()`
+
+#### Description
+
+Defines the PWM pin which controls the brightness of the backlight. For `LCD` it must be called before `begin()`, which configures the pin as output.
+
+#### Syntax
+
+```
+lcd.setBrightnessPin(pin)
+```
+
+#### Parameters
+lcd: a variable of type LCD or LCD_I2C
+
+pin: a PWM capable pin which is connected to the backlight (LED anode)
+
+### `setBrightness()`
+
+#### Description
+
+Sets the brightness of the backlight: 0 is off, 100 is full brightness (values above 100 are limited to 100). Nothing happens if no brightness pin was defined.
+
+#### Syntax
+
+```
+lcd.setBrightness(percent)
+```
+
+#### Parameters
+lcd: a variable of type LCD or LCD_I2C
+
+percent: the brightness from 0 to 100
+
+#### Example
+
+```
+LCD lcd(12, 11, 5, 4, 3, 2);
+
+void setup() {
+  lcd.setBrightnessPin(6);
+  lcd.begin(16, 2);
+  lcd.setBrightness(50);
 }
 
 void loop() {}

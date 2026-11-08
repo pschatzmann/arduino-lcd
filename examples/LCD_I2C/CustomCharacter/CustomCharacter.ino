@@ -99,6 +99,8 @@ byte armsUp[8] = {
 };
 
 void setup() {
+  // the I2C bus must be started by the sketch
+  Wire.begin();
   // initialize LCD and set up the number of columns and rows:
   lcd.begin(16, 2);
 

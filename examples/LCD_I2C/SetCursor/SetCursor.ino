@@ -46,6 +46,8 @@ const int numRows = 2;
 const int numCols = 16;
 
 void setup() {
+  // the I2C bus must be started by the sketch
+  Wire.begin();
   // set up the LCD's number of columns and rows:
   lcd.begin(numCols, numRows);
 }

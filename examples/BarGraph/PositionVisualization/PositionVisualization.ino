@@ -8,7 +8,7 @@ LCDBarGraph lbg(lcd, 4, 12, 1);  // -- creating a 4 char wide baraph in the end 
 
 void setup(){
   // -- initializing the LCD
-  lcd.begin(2, lcdNumCols);
+  lcd.begin(lcdNumCols, 2);
   lcd.clear();
   // -- do some delay: some time I've got broken visualization
   delay(100);

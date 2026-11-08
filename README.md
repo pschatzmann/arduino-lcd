@@ -30,5 +30,9 @@ For an I2C module use `LCD_I2C lcd(0x27);` instead. The rest of the sketch stays
 - [Why another LCD library?](docs/why.md)
 - [Usage notes](docs/usage-notes.md)
 - [API reference](docs/api.md)
+- [I2C displays](docs/i2c.md)
+- [Bar graph](docs/bargraph.md)
+- [Menu](docs/menu.md)
+- [Client/server mode](docs/client-server.md)
 - [Testing](docs/testing.md): desktop tests with an HD44780 emulator that records the screen as images
 - [Examples](examples): `LCD`, `LCD_I2C`, `BarGraph`, `Menu` and `Serial` (client/server)

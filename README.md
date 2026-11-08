@@ -22,6 +22,8 @@ void setup() {
 void loop() {}
 ```
 
+For an I2C module use `LCD_I2C lcd(0x27);` instead. The rest of the sketch stays the same.
+
 ## Documentation
 
 - [Class Documentation](https://pschatzmann.github.io/arduino-lcd/annotated.html)

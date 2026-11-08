@@ -16,4 +16,4 @@ ctest --test-dir build/test --output-on-failure
 ## Not covered
 
 - The examples are only compile-checked with `arduino-cli` (Uno, ESP32, RP2040).
-- Nothing was run on real hardware. Please test your display, especially `LCD_I2C` (the initialization delay was shortened from 1000 ms to 50 ms).
+- Nothing was run on real hardware. Please test your display, especially `LCD_I2C` (the initialization waits only 50 ms).

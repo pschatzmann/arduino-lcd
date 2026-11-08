@@ -32,5 +32,5 @@ void loop() {
 
 - The bar uses the custom characters 0 to 4 of the display and overwrites your own characters in these slots.
 - The constructor clears the display, so create the bar after `lcd.begin()`.
-- Several bars can be shown at the same time, see `examples/BarGraph/MoreGraphs`.
+- Several bars can be shown at the same time, see `examples/BarGraph/MultipleBars`.
 - Do not call `drawValue()` more often than needed: frequent writes can make the display flicker.

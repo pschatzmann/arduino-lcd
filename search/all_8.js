@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['nextscreen_0',['nextScreen',['../class_l_c_d_menu.html#a8bddd8b2e1c3ee62cd4d69c515db81a2',1,'LCDMenu']]],
-  ['nexttext_1',['nexttext',['../class_l_c_d_menu_screen.html#ab0c4885e7ada97b77c80aa71c27b1716',1,'LCDMenuScreen::nextText()'],['../class_l_c_d_menu.html#a40224208ae5e297e7d012b1de27d9991',1,'LCDMenu::nextText()']]],
-  ['notes_2',['Notes',['../index.html#autotoc_md3',1,'']]]
+  ['priorscreen_0',['priorScreen',['../class_l_c_d_menu.html#aa4f4146f1496dd554dfc480b774ca74a',1,'LCDMenu']]],
+  ['priortext_1',['priortext',['../class_l_c_d_menu.html#af45858cbf5cf1ee0df40e02466fa3cc5',1,'LCDMenu::priorText()'],['../class_l_c_d_menu_screen.html#af41a1fdfeb70277e237e99993f88756a',1,'LCDMenuScreen::priorText()']]],
+  ['process_2',['process',['../class_l_c_d_server.html#af62be7bf576aca7fb2c29037792e2751',1,'LCDServer']]]
 ];

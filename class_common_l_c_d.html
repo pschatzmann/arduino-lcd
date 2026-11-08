@@ -82,7 +82,7 @@ $(function() {
 <p>Output to <a class="el" href="class_l_c_d.html" title="Output to LCD.">LCD</a> - Common Functionality.  
  <a href="class_common_l_c_d.html#details">More...</a></p>
 
-<p><code>#include &lt;<a class="el" href="_l_c_d_8h_source.html">LCD.h</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="_common_l_c_d_8h_source.html">CommonLCD.h</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for CommonLCD:</div>
 <div class="dyncontent">
@@ -154,6 +154,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>createChar</b> (uint8
 size_t&#160;</td><td class="memItemRight" valign="bottom"><b>write</b> (uint8_t value)</td></tr>
 <tr class="memdesc:a7bd23d742dc7a9533b94a35d001746e2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Output of a single char. <br /></td></tr>
 <tr class="separator:a7bd23d742dc7a9533b94a35d001746e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa1e6cda79c782405874e234c41b8ae12" id="r_aa1e6cda79c782405874e234c41b8ae12"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_common_l_c_d.html#aa1e6cda79c782405874e234c41b8ae12">setBrightnessPin</a> (uint8_t pin)</td></tr>
+<tr class="separator:aa1e6cda79c782405874e234c41b8ae12"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1aac61c7d19a3717aa7e2ac13345dc89" id="r_a1aac61c7d19a3717aa7e2ac13345dc89"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_common_l_c_d.html#a1aac61c7d19a3717aa7e2ac13345dc89">setBrightness</a> (uint16_t percent)</td></tr>
 <tr class="separator:a1aac61c7d19a3717aa7e2ac13345dc89"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -352,8 +354,35 @@ static const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>LCD_5
 
 </div>
 </div>
+<a id="aa1e6cda79c782405874e234c41b8ae12" name="aa1e6cda79c782405874e234c41b8ae12"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa1e6cda79c782405874e234c41b8ae12">&#9670;&#160;</a></span>setBrightnessPin()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void CommonLCD::setBrightnessPin </td>
+          <td>(</td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>pin</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Defines the PWM pin of the backlight which is used by <a class="el" href="class_common_l_c_d.html#a1aac61c7d19a3717aa7e2ac13345dc89">setBrightness()</a>. For <a class="el" href="class_l_c_d.html" title="Output to LCD.">LCD</a> this must be called before <a class="el" href="class_common_l_c_d.html#a11b7e4622a77ddb2450afe10bd0c6468" title="Starts the processing by defining the number of columns and rows.">begin()</a>. </p>
+
+</div>
+</div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>src/<a class="el" href="_l_c_d_8h_source.html">LCD.h</a></li>
+<li>src/LCD/<a class="el" href="_common_l_c_d_8h_source.html">CommonLCD.h</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

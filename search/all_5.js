@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['from_20liquidcrystal_0',['Summary of differences from LiquidCrystal',['../index.html#autotoc_md2',1,'']]]
+  ['getfilledchar_0',['getFilledChar',['../class_l_c_d_bar_graph.html#abd292fa8fe06eabd44f8bbe003d252af',1,'LCDBarGraph']]]
 ];
